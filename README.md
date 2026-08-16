@@ -272,6 +272,10 @@ We list the neural networks trained and evaluated by `TopoBench`, organized by t
 
 **Remark:** Note that MLP only works in single-graph transductive settings or with datasets where all graphs have the same number of nodes.
 
+### Explainability (TopoSHAP)
+
+`TopoBench` includes `topobench.explain`, a Shapley-based explainability toolkit for topological models. It answers two practitioner questions: *which cells drive this prediction?* — via exact (or permutation-sampled) Shapley values over the cells of a complex — and *which neighborhoods earn their compute?* — via coalition-masking games over a TopoTune backbone's message-passing neighborhoods, with subset selectors (top-k, anchored, greedy, and automatic-size rules) and in-place pruning to continue training on the selected coalition. Every attribution can be audited with executable axiom checks (efficiency, null players, symmetry, batch invariance). See the [explainability tutorial](https://github.com/geometric-intelligence/TopoBench/tree/main/tutorials/tutorial_explain.ipynb) for an end-to-end example.
+
 
 ## :rocket: Liftings and Transforms
 

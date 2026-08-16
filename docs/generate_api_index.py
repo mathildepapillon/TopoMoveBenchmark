@@ -38,6 +38,11 @@ def organize_by_package_structure(modules):
             "description": "Model evaluation metrics and tools",
             "modules": [],
         },
+        "topobench.explain": {
+            "title": "Explainability",
+            "description": "Shapley-based explanation of predictions and neighborhoods",
+            "modules": [],
+        },
         "topobench.loss": {
             "title": "Loss Functions",
             "description": "Loss functions for training topological models",
