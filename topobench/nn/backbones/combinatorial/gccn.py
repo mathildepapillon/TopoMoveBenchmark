@@ -360,8 +360,11 @@ def interrank_boundary_index(x_src, boundary_index, n_dst_nodes):
 
     Returns
     -------
-    edge_index : list of lists
-        The edge_index[0][i] and edge_index[1][i] are the two nodes of edge i.
+    edge_index : torch.tensor
+        Edge index of the lifted graph, oriented source-to-target following
+        the PyG convention: edge_index[0] holds the offset source-cell ids
+        (message senders) and edge_index[1] holds the destination-cell ids
+        (message receivers), so aggregation lands on the destination cells.
     edge_attr : tensor
         Edge features are given by feature of bounding node represnting an edge. Shape [n_edges, n_features].
     """
@@ -380,8 +383,8 @@ def interrank_boundary_index(x_src, boundary_index, n_dst_nodes):
     adjusted_edge_ids = edge_ids + max_node_id
 
     edge_index = torch.zeros((2, node_ids.numel()), dtype=node_ids.dtype)
-    edge_index[0, :] = node_ids
-    edge_index[1, :] = adjusted_edge_ids
+    edge_index[0, :] = adjusted_edge_ids
+    edge_index[1, :] = node_ids
 
     edge_attr = x_src[edge_ids].squeeze()
 
