@@ -1,8 +1,11 @@
 """Cell-level Shapley explanations of individual predictions.
 
 Players are the cells of a complex (nodes, edges, faces — any rank). The
-game masks the features of absent cells to a baseline (zeros by default) and
-reads the model's output for the explained target. Values are exact via
+game masks the features of absent cells to a baseline and reads the model's
+output for the explained target. Masking can act on the raw feature rows
+(default) or, when an ``encoder`` is supplied, on the encoded rows the
+message-passing backbone consumes — the encoder is then applied once and
+treated as fixed preprocessing outside the game. Values are exact via
 :func:`topobench.explain.shapley.shapley_values` when the player set is
 small, and permutation-sampled otherwise.
 """
@@ -69,9 +72,8 @@ class CellMaskingGame:
     """Game whose value is the model output with absent cells masked.
 
     ``v(S)`` runs the model on the batch with the features of every cell
-    outside ``S`` masked, and reads the scalar being explained. Masking
-    zeroes the masked cells' rows in ``x_{rank}`` (or replaces them with
-    the corresponding ``baseline[rank]`` rows if given) — features only;
+    outside ``S`` masked, and reads the scalar being explained (for logit
+    games, typically the target-class logit). Only features are replaced;
     the incidence structure stays intact, so the game is exactly "this
     cell's signal is absent", not "the complex is rewired".
 
@@ -79,13 +81,25 @@ class CellMaskingGame:
     ----------
     model_fn : callable
         Maps a batch to the scalar being explained (e.g. the logit or
-        probability of the predicted class for one sample).
+        probability of the predicted class for one sample). When
+        ``encoder`` is given, ``model_fn`` must run only the post-encoder
+        stages (backbone and readout), never the encoder again.
     batch : object
         Batch object exposing per-rank feature matrices ``x_{rank}``.
     players : list[CellPlayer]
         Cells acting as players, in player (bit) order.
-    baseline : dict[int, torch.Tensor], optional
-        Per-rank replacement features for masked cells; zeros by default.
+    baseline : dict[int, torch.Tensor] or str, optional
+        What masked rows become. ``"zeros"`` (default without an encoder)
+        fills with zero vectors; ``"complex_mean"`` (default with an
+        encoder) uses the per-rank mean over this complex's own
+        (post-encoder) feature rows; a dict maps rank to either one
+        baseline row of shape ``[hidden]`` (broadcast to every masked cell
+        of that rank, e.g. per-rank train-split means) or a per-cell
+        replacement matrix of shape ``[n_cells, hidden]``.
+    encoder : callable, optional
+        Feature encoder applied to ``batch`` exactly once at construction
+        (under ``no_grad``). Masking then acts on the encoded rows, making
+        the encoder fixed preprocessing outside the game.
     """
 
     def __init__(
@@ -93,12 +107,17 @@ class CellMaskingGame:
         model_fn,
         batch,
         players: list[CellPlayer],
-        baseline: dict[int, torch.Tensor] | None = None,
+        baseline: dict[int, torch.Tensor] | str | None = None,
+        encoder=None,
     ):
         self.model_fn = model_fn
+        self.encoder = encoder
+        if encoder is not None:
+            # Encode once; the game lives on encoded rows.
+            with torch.no_grad():
+                batch = encoder(batch)
         self.batch = batch
         self.players = players
-        self.baseline = baseline or {}
         # Snapshot EVERY rank's features, not just player ranks: backbones
         # such as TopoTune overwrite batch.x_{rank} with hidden states
         # during forward, so each evaluation must start from pristine
@@ -111,6 +130,26 @@ class CellMaskingGame:
         missing = {p.rank for p in players} - set(self._originals)
         if missing:
             raise ValueError(f"batch has no features for ranks {missing}")
+
+        if baseline is None:
+            baseline = "complex_mean" if encoder is not None else "zeros"
+        self.baseline_name = (
+            baseline if isinstance(baseline, str) else "custom"
+        )
+        player_ranks = {p.rank for p in players}
+        if baseline == "zeros":
+            self.baseline = {}
+        elif baseline == "complex_mean":
+            self.baseline = {
+                r: self._originals[r].mean(0) for r in player_ranks
+            }
+        elif isinstance(baseline, dict):
+            self.baseline = {
+                r: fill.to(self._originals[r].dtype)
+                for r, fill in baseline.items()
+            }
+        else:
+            raise ValueError(f"unknown baseline {baseline!r}")
 
     def __call__(self, mask: int) -> float:
         """Evaluate the model with cells outside the coalition masked.
@@ -133,9 +172,12 @@ class CellMaskingGame:
                     continue
                 x = getattr(self.batch, f"x_{player.rank}")
                 fill = self.baseline.get(player.rank)
-                x[player.index] = (
-                    fill[player.index] if fill is not None else 0.0
-                )
+                if fill is None:
+                    x[player.index] = 0.0
+                elif fill.dim() == 1:  # one baseline row per rank
+                    x[player.index] = fill
+                else:  # per-cell replacement rows
+                    x[player.index] = fill[player.index]
             with torch.no_grad():
                 return float(self.model_fn(self.batch))
         finally:
@@ -150,6 +192,8 @@ def explain_cells(
     interactions: bool = False,
     passes: int = 128,
     seed: int | None = None,
+    baseline: dict[int, torch.Tensor] | str | None = None,
+    encoder=None,
 ) -> CellExplanation:
     """Explain one prediction by Shapley values over cells.
 
@@ -172,6 +216,11 @@ def explain_cells(
         Sampling budget (permutations) used in the sampled regime.
     seed : int, optional
         Seed for the sampled regime.
+    baseline : dict[int, torch.Tensor] or str, optional
+        Forwarded to :class:`CellMaskingGame`.
+    encoder : callable, optional
+        Forwarded to :class:`CellMaskingGame`; when given, masking acts on
+        encoded features and ``model_fn`` must not re-apply the encoder.
 
     Returns
     -------
@@ -180,7 +229,9 @@ def explain_cells(
         accounting.
     """
     n = len(players)
-    raw_game = CellMaskingGame(model_fn, batch, players)
+    raw_game = CellMaskingGame(
+        model_fn, batch, players, baseline=baseline, encoder=encoder
+    )
     game = CachedGame(n_players=n, evaluate=raw_game)
 
     if n <= EXACT_PLAYER_LIMIT:

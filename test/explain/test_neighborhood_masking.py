@@ -264,3 +264,142 @@ def test_cell_masking_game_efficiency_on_backbone():
         evaluate=CellMaskingGame(model_fn, batch, players),
     )
     check_efficiency(explanation.phi, game, len(players), atol=1e-4)
+
+
+class _RankEncoder(torch.nn.Module):
+    """Per-rank linear feature encoder (mutates the batch and returns it)."""
+
+    def __init__(self, channels, seed=0):
+        super().__init__()
+        torch.manual_seed(seed)
+        self.linears = torch.nn.ModuleDict(
+            {str(r): torch.nn.Linear(channels, channels) for r in range(3)}
+        )
+
+    def forward(self, batch):
+        for r in range(3):
+            setattr(
+                batch,
+                f"x_{r}",
+                self.linears[str(r)](getattr(batch, f"x_{r}")),
+            )
+        return batch
+
+
+def test_cell_game_encoded_masking_baselines():
+    """With an encoder the game masks encoded rows; masked rows become the
+    chosen baseline (per-rank mean by default, one row per rank, per-cell
+    rows, or zeros), and the batch is restored after every evaluation."""
+    backbone = make_backbone(template_seed=8, weight_seed=9)
+    encoder = _RankEncoder(channels=8, seed=10)
+
+    def model_fn(b):
+        with torch.no_grad():
+            return backbone(b)[0].sum()  # scalar readout over node rank
+
+    players = [CellPlayer(rank=0, index=i) for i in range(4)] + [
+        CellPlayer(rank=2, index=j) for j in range(2)
+    ]
+
+    def fresh_encoded():
+        with torch.no_grad():
+            return encoder(two_triangle_batch(seed=11))
+
+    def value_with_rows(fill_by_rank):
+        b = fresh_encoded()
+        for rank, fill in fill_by_rank.items():
+            x = getattr(b, f"x_{rank}")
+            setattr(b, f"x_{rank}", fill.expand_as(x).clone())
+        with torch.no_grad():
+            return float(model_fn(b))
+
+    # default with an encoder: per-rank mean of the encoded rows
+    game = CellMaskingGame(
+        model_fn, two_triangle_batch(seed=11), players, encoder=encoder
+    )
+    assert game.baseline_name == "complex_mean"
+    reference = fresh_encoded()
+    expected = value_with_rows(
+        {0: reference.x_0.mean(0), 2: reference.x_2.mean(0)}
+    )
+    assert abs(game(0) - expected) < 1e-5
+
+    # snapshot/restore: the encoded originals survive evaluations
+    for rank in range(3):
+        assert torch.equal(
+            getattr(game.batch, f"x_{rank}"), game._originals[rank]
+        )
+
+    # one baseline row per rank (e.g. train-split means)
+    rows = {
+        0: torch.randn(8, generator=torch.Generator().manual_seed(12)),
+        2: torch.randn(8, generator=torch.Generator().manual_seed(13)),
+    }
+    game_rows = CellMaskingGame(
+        model_fn,
+        two_triangle_batch(seed=11),
+        players,
+        baseline=dict(rows),
+        encoder=encoder,
+    )
+    assert abs(game_rows(0) - value_with_rows(rows)) < 1e-5
+
+    # per-cell replacement rows keep working
+    mats = {
+        0: torch.randn(4, 8, generator=torch.Generator().manual_seed(14)),
+        2: torch.randn(2, 8, generator=torch.Generator().manual_seed(15)),
+    }
+    game_mats = CellMaskingGame(
+        model_fn,
+        two_triangle_batch(seed=11),
+        players,
+        baseline=dict(mats),
+        encoder=encoder,
+    )
+    b = fresh_encoded()
+    b.x_0 = mats[0].clone()
+    b.x_2 = mats[2].clone()
+    with torch.no_grad():
+        expected_mats = float(model_fn(b))
+    assert abs(game_mats(0) - expected_mats) < 1e-5
+
+    # zeros stays available with an encoder
+    game_zero = CellMaskingGame(
+        model_fn,
+        two_triangle_batch(seed=11),
+        players,
+        baseline="zeros",
+        encoder=encoder,
+    )
+    expected_zero = value_with_rows({0: torch.zeros(8), 2: torch.zeros(8)})
+    assert abs(game_zero(0) - expected_zero) < 1e-5
+
+    # the full coalition is encoder-only: identical across all baselines
+    full = (1 << len(players)) - 1
+    for g in (game_rows, game_mats, game_zero):
+        assert abs(g(full) - game(full)) < 1e-5
+
+
+def test_cell_game_encoded_efficiency():
+    """explain_cells with an encoder satisfies efficiency on the same game."""
+    backbone = make_backbone(template_seed=8, weight_seed=9)
+    encoder = _RankEncoder(channels=8, seed=10)
+
+    def model_fn(b):
+        with torch.no_grad():
+            return backbone(b)[0].sum()
+
+    players = [CellPlayer(rank=0, index=i) for i in range(4)] + [
+        CellPlayer(rank=2, index=j) for j in range(2)
+    ]
+    explanation = explain_cells(
+        model_fn, two_triangle_batch(seed=11), players, encoder=encoder
+    )
+    assert explanation.exact
+    game = CachedGame(
+        n_players=len(players),
+        evaluate=CellMaskingGame(
+            model_fn, two_triangle_batch(seed=11), players, encoder=encoder
+        ),
+    )
+    check_efficiency(explanation.phi, game, len(players), atol=1e-4)
