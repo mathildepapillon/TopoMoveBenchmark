@@ -31,6 +31,7 @@ from .axioms import (
     find_null_players,
 )
 from .cells import (
+    DEFAULT_MAX_EXACT_EVALUATIONS,
     EXACT_PLAYER_LIMIT,
     CellExplanation,
     CellMaskingGame,
@@ -73,6 +74,7 @@ from .shapley import (
 )
 
 __all__ = [
+    "DEFAULT_MAX_EXACT_EVALUATIONS",
     "EXACT_PLAYER_LIMIT",
     "CachedGame",
     "CellExplanation",

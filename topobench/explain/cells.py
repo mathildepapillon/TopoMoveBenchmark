@@ -24,6 +24,7 @@ degenerate baselines at construction; ``baseline="zeros"`` is the safe
 choice for constant features.
 """
 
+import warnings
 from dataclasses import dataclass
 
 import numpy as np
@@ -36,8 +37,13 @@ from topobench.explain.shapley import (
     shapley_values,
 )
 
-#: Practical exact-enumeration ceiling: 2^20 forward passes.
+#: Hard exact-enumeration ceiling: never enumerate beyond 2^20 coalitions.
 EXACT_PLAYER_LIMIT = 20
+
+#: Default cap on exact-regime model evaluations (2^16); exceeding it
+#: falls back to permutation sampling with a warning. See
+#: :func:`explain_cells`.
+DEFAULT_MAX_EXACT_EVALUATIONS = 65536
 
 
 @dataclass(frozen=True)
@@ -356,12 +362,16 @@ def explain_cells(
     seed: int | None = None,
     baseline: dict[int, torch.Tensor] | str | None = None,
     encoder=None,
+    max_exact_evaluations: int = DEFAULT_MAX_EXACT_EVALUATIONS,
 ) -> CellExplanation:
     """Explain one prediction by Shapley values over cells.
 
     Exact enumeration is used when ``len(players)`` is at most
-    :data:`EXACT_PLAYER_LIMIT`, permutation sampling otherwise. Pairwise
-    interaction indices are only computed in the exact regime.
+    :data:`EXACT_PLAYER_LIMIT` and the ``2 ** len(players)`` model
+    evaluations it costs fit within ``max_exact_evaluations``; permutation
+    sampling (budgeted by ``passes``) is used otherwise. Falling back
+    because of the evaluation cap emits a warning. Pairwise interaction
+    indices are only computed in the exact regime.
 
     Parameters
     ----------
@@ -383,6 +393,11 @@ def explain_cells(
     encoder : callable, optional
         Forwarded to :class:`CellMaskingGame`; when given, masking acts on
         encoded features and ``model_fn`` must not re-apply the encoder.
+    max_exact_evaluations : int
+        Cap on the number of model evaluations the exact regime may cost
+        (default :data:`DEFAULT_MAX_EXACT_EVALUATIONS` = 2^16). When
+        ``2 ** len(players)`` exceeds it, the sampled estimator is used
+        instead and a warning explains how to restore exactness.
 
     Returns
     -------
@@ -396,7 +411,7 @@ def explain_cells(
     )
     game = CachedGame(n_players=n, evaluate=raw_game)
 
-    if n <= EXACT_PLAYER_LIMIT:
+    if n <= EXACT_PLAYER_LIMIT and (1 << n) <= max_exact_evaluations:
         phi = shapley_values(game, n)
         inter = shapley_interaction(game, n, order=2) if interactions else None
         return CellExplanation(
@@ -408,7 +423,21 @@ def explain_cells(
         )
     if interactions:
         raise ValueError(
-            f"exact interactions need <= {EXACT_PLAYER_LIMIT} players, got {n}"
+            "exact interactions need the exact regime: at most "
+            f"{EXACT_PLAYER_LIMIT} players and 2**n_players <= "
+            f"max_exact_evaluations; got {n} players with "
+            f"max_exact_evaluations={max_exact_evaluations}"
+        )
+    if n <= EXACT_PLAYER_LIMIT:
+        warnings.warn(
+            f"exact Shapley values over {n} players would cost 2**{n} = "
+            f"{1 << n} model evaluations, above max_exact_evaluations="
+            f"{max_exact_evaluations}; falling back to permutation "
+            f"sampling with passes={passes} (approximate values). Pass "
+            f"max_exact_evaluations={1 << n} or higher to restore "
+            "exactness, or reduce the number of players (or passes) to "
+            "reduce cost.",
+            stacklevel=2,
         )
     att = sampled_shapley(game, n, passes=passes, seed=seed)
     return CellExplanation(
