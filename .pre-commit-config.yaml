@@ -1,6 +1,10 @@
 default_language_version:
   python: python3.11
 
+# graphxai_vendor is vendored verbatim from mims-harvard/GraphXAI and is
+# excluded from every hook so it stays byte-comparable to upstream.
+exclude: ^topobench/data/datasets/graphxai_vendor/
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0

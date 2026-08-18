@@ -146,7 +146,9 @@ wrap-descriptions = 79
 
 [tool.ruff]
 target-version = "py311"
-extend-exclude = ["test", "tutorials", "notebooks", "scripts", "docs", "2026_tdl_challenge"]
+# graphxai_vendor is vendored verbatim from mims-harvard/GraphXAI and is
+# excluded from lint and format so it stays byte-comparable to upstream.
+extend-exclude = ["test", "tutorials", "notebooks", "scripts", "docs", "2026_tdl_challenge", "topobench/data/datasets/graphxai_vendor"]
 line-length = 79
 
 [tool.ruff.format]

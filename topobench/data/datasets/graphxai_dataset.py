@@ -174,7 +174,9 @@ class GraphXAIDataset(InMemoryDataset):
         there unless already staged in :attr:`raw_dir`.
         """
         if self.name == "Mutagenicity":
-            TUDataset(root=self.raw_dir, name="Mutagenicity", use_node_attr=False)
+            TUDataset(
+                root=self.raw_dir, name="Mutagenicity", use_node_attr=False
+            )
             return
         path = osp.join(self.raw_dir, NPZ_DATASETS[self.name])
         if not osp.isfile(path):
@@ -202,7 +204,9 @@ class GraphXAIDataset(InMemoryDataset):
 
     # ------------------------------------------------------------------ builders
 
-    def _finalize(self, x, edge_index, edge_attr, y, cand_node, cand_edge, index):
+    def _finalize(
+        self, x, edge_index, edge_attr, y, cand_node, cand_edge, index
+    ):
         """Assemble one graph plus its candidate masks.
 
         Parameters
@@ -325,7 +329,9 @@ class GraphXAIDataset(InMemoryDataset):
         tuple
             ``(list of Data, list of candidate dicts)``.
         """
-        tu = TUDataset(root=self.raw_dir, name="Mutagenicity", use_node_attr=False)
+        tu = TUDataset(
+            root=self.raw_dir, name="Mutagenicity", use_node_attr=False
+        )
         graphs, candidates = [], []
         for data in tu:
             data = data.clone()
@@ -336,7 +342,9 @@ class GraphXAIDataset(InMemoryDataset):
             data.edge_index = edge_idx
             data.num_nodes = int(data.x.shape[0])
 
-            mol_g = to_networkx_conv(data, node_attrs=["x"], to_undirected=True)
+            mol_g = to_networkx_conv(
+                data, node_attrs=["x"], to_undirected=True
+            )
             matches = (
                 match_substruct_mutagenicity(mol_g, MUTAG_NH2, nh2_no2=0)
                 + match_substruct_mutagenicity(mol_g, MUTAG_NO2, nh2_no2=1)
