@@ -380,6 +380,50 @@ def test_cell_game_encoded_masking_baselines():
         assert abs(g(full) - game(full)) < 1e-5
 
 
+def test_cell_game_refuses_degenerate_baseline():
+    """complex_mean with constant per-rank features must be refused.
+
+    With constant features the per-rank mean IS every row, so masking
+    replaces rows with themselves: every coalition gets the same value
+    and all Shapley values are exactly 0. The game must refuse this at
+    construction and the suggested zeros baseline must yield a live game.
+    """
+    backbone = make_backbone(template_seed=8, weight_seed=9)
+
+    def model_fn(b):
+        with torch.no_grad():
+            return backbone(b)[0].sum()  # scalar readout over node rank
+
+    def constant_batch():
+        batch = two_triangle_batch(seed=11)
+        batch.x_0 = torch.ones_like(batch.x_0)
+        batch.x_1 = 2.0 * torch.ones_like(batch.x_1)
+        batch.x_2 = -torch.ones_like(batch.x_2)
+        return batch
+
+    players = [CellPlayer(rank=0, index=i) for i in range(4)] + [
+        CellPlayer(rank=2, index=j) for j in range(2)
+    ]
+
+    with pytest.raises(ValueError, match="degenerate baseline"):
+        CellMaskingGame(
+            model_fn, constant_batch(), players, baseline="complex_mean"
+        )
+
+    # the default with an encoder is complex_mean, and a per-rank encoder
+    # maps constant rows to constant rows — the guard must fire there too
+    encoder = _RankEncoder(channels=8, seed=10)
+    with pytest.raises(ValueError, match="degenerate baseline"):
+        CellMaskingGame(model_fn, constant_batch(), players, encoder=encoder)
+
+    # the suggested fix yields a game that separates coalitions
+    game = CellMaskingGame(
+        model_fn, constant_batch(), players, baseline="zeros"
+    )
+    full = (1 << len(players)) - 1
+    assert game(full) != game(0)
+
+
 def test_cell_game_encoded_efficiency():
     """explain_cells with an encoder satisfies efficiency on the same game."""
     backbone = make_backbone(template_seed=8, weight_seed=9)

@@ -15,6 +15,13 @@ tensors ``x{rank}_{hop}`` and never read ``x_{rank}``, so
 :class:`CellMaskingGame` is a structural no-op on them — use
 :class:`HopseCellMaskingGame` instead, which masks the encoded per-hop
 rows.
+
+Masking must also actually change the tensors: when per-rank features are
+constant across cells, the ``"complex_mean"`` baseline replaces masked
+rows with themselves, so every coalition gets the same value and all
+Shapley values are exactly 0. :class:`CellMaskingGame` refuses such
+degenerate baselines at construction; ``baseline="zeros"`` is the safe
+choice for constant features.
 """
 
 from dataclasses import dataclass
@@ -102,11 +109,23 @@ class CellMaskingGame:
         (post-encoder) feature rows; a dict maps rank to either one
         baseline row of shape ``[hidden]`` (broadcast to every masked cell
         of that rank, e.g. per-rank train-split means) or a per-cell
-        replacement matrix of shape ``[n_cells, hidden]``.
+        replacement matrix of shape ``[n_cells, hidden]``. Note that
+        ``"complex_mean"`` degenerates when a rank's features are
+        constant across cells: the mean IS every row, so masking that
+        rank replaces rows with themselves. ``baseline="zeros"`` is the
+        safe choice for constant features.
     encoder : callable, optional
         Feature encoder applied to ``batch`` exactly once at construction
         (under ``no_grad``). Masking then acts on the encoded rows, making
         the encoder fixed preprocessing outside the game.
+
+    Raises
+    ------
+    ValueError
+        If the resolved baseline rows equal the original feature rows on
+        every player rank — the game would then be constant (every
+        coalition identical, all Shapley values exactly 0), so the
+        degenerate setup is refused at construction.
     """
 
     def __init__(
@@ -157,6 +176,52 @@ class CellMaskingGame:
             }
         else:
             raise ValueError(f"unknown baseline {baseline!r}")
+
+        # Guard against a degenerate game: if the resolved baseline rows
+        # equal the original rows on every player rank (e.g.
+        # "complex_mean" when a rank's features are constant, so the mean
+        # IS every row), masking replaces rows with themselves — every
+        # coalition gets the same value and all Shapley values are
+        # exactly 0.
+        if all(self._baseline_equals_originals(r) for r in player_ranks):
+            raise ValueError(
+                f"degenerate baseline {self.baseline_name!r}: the resolved "
+                "baseline rows equal the original feature rows on every "
+                "player rank, so masking is a no-op — every coalition gets "
+                "the same value and all Shapley values are exactly 0 (this "
+                "happens e.g. with baseline='complex_mean' when per-rank "
+                "features are constant); pass a baseline that differs from "
+                'the features, such as baseline="zeros"'
+            )
+
+    def _baseline_equals_originals(self, rank: int) -> bool:
+        """Check whether masking rows of ``rank`` would replace them with
+        themselves.
+
+        Parameters
+        ----------
+        rank : int
+            Player rank to resolve the baseline for.
+
+        Returns
+        -------
+        bool
+            True when the resolved replacement rows equal the original
+            feature rows of ``rank`` exactly.
+        """
+        original = self._originals[rank]
+        fill = self.baseline.get(rank)
+        if fill is None:  # zeros
+            rows = torch.zeros_like(original)
+        elif fill.dim() == 1:  # one baseline row per rank
+            if fill.shape != original.shape[1:]:
+                return False
+            rows = fill.expand_as(original)
+        else:  # per-cell replacement rows
+            if fill.shape != original.shape:
+                return False
+            rows = fill
+        return torch.equal(rows, original)
 
     def __call__(self, mask: int) -> float:
         """Evaluate the model with cells outside the coalition masked.
