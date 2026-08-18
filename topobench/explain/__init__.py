@@ -8,7 +8,9 @@ each coalition. Two uses are supported:
 * **Explain a prediction** (cells as players): :func:`explain_cells` masks
   the features of absent cells and attributes one model output to the cells
   of the complex — exact Shapley values for small player sets, permutation
-  sampling beyond that.
+  sampling beyond that. Models that consume per-hop encodings (HOPSE) need
+  :class:`HopseCellMaskingGame`, which masks at the interface they actually
+  read.
 * **Explain performance** (neighborhoods as players): wrap a TopoTune
   backbone in :class:`CoalitionMaskedBackbone`, score coalitions of
   message-passing neighborhoods with any metric, attribute it with
@@ -30,6 +32,7 @@ from .cells import (
     CellExplanation,
     CellMaskingGame,
     CellPlayer,
+    HopseCellMaskingGame,
     explain_cells,
 )
 from .games import CachedGame, Game, TabulatedGame
@@ -67,6 +70,7 @@ __all__ = [
     "CellPlayer",
     "CoalitionMaskedBackbone",
     "Game",
+    "HopseCellMaskingGame",
     "SampledAttribution",
     "SubmodularityCensus",
     "TabulatedGame",
