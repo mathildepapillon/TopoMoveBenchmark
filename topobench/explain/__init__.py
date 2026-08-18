@@ -21,7 +21,10 @@ For end-to-end neighborhood selection, :func:`run_ladder` packages the
 performance game into one fixed pipeline: all-players stem ->
 backward-elimination ladder on the masked validation game -> train B
 rungs -> validation selects. Every attribution can be audited with the
-executable axiom checks in :mod:`topobench.explain.axioms`.
+executable axiom checks in :mod:`topobench.explain.axioms`, and on the
+GraphXAI datasets explanations can be scored against the shipped ground
+truth with the metrics in :mod:`topobench.explain.metrics` (GEA
+explanation accuracy, GEF unfaithfulness).
 """
 
 from .axioms import (
@@ -46,6 +49,14 @@ from .ladder import (
     backward_elimination_ladder,
     binomial_se,
     run_ladder,
+)
+from .metrics import (
+    gea_jaccard,
+    gef_unfaithfulness,
+    graph_explanation_accuracy,
+    node_projected_scores,
+    random_control_gea,
+    top_nodes_by_attribution,
 )
 from .neighborhoods import (
     CoalitionMaskedBackbone,
@@ -99,10 +110,15 @@ __all__ = [
     "efficiency_gap",
     "explain_cells",
     "find_null_players",
+    "gea_jaccard",
+    "gef_unfaithfulness",
+    "graph_explanation_accuracy",
     "greedy_mask",
     "greedy_with_noise_stop",
     "mask_to_coalition",
+    "node_projected_scores",
     "prune_backbone_",
+    "random_control_gea",
     "resample_pick_stability",
     "run_ladder",
     "sampled_shapley",
@@ -112,4 +128,5 @@ __all__ = [
     "submodularity_census",
     "threshold_at_zero",
     "top_k_mask",
+    "top_nodes_by_attribution",
 ]
