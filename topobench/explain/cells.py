@@ -343,6 +343,21 @@ class HopseCellMaskingGame:
     structural encodings are absent"); a complex mean over positional
     encodings has no signal-absent reading.
 
+    Fused encoders are refused. With ``fuse_pse2cell=True`` the HOPSE
+    encoder additionally writes a fused ``x_{rank}`` at encode time (a
+    linear projection of the concatenated per-hop encodings,
+    ``hopse_encoder.py`` lines 136-144), and fused-mode models read that
+    tensor instead of the per-hop tensors (e.g. the graph HOPSE configs
+    wrap a plain GNN whose wrapper reads only ``batch.x_0``). Because
+    this game runs the encoder exactly once at construction and then
+    masks the per-hop tensors, the fused ``x_{rank}`` is never
+    recomputed — post-encoding hop-masking never reaches the
+    computation, making the game a structural no-op
+    (``v(full) == v(empty)`` exactly). Construction therefore raises
+    ``ValueError`` for such encoders; use :class:`CellMaskingGame` with
+    ``encoder=`` instead, which masks the fused post-encoder
+    ``x_{rank}`` rows the model actually reads.
+
     Parameters
     ----------
     model_fn : callable
@@ -360,6 +375,14 @@ class HopseCellMaskingGame:
     max_hop : int
         Number of hop tensors per rank
         (``x{rank}_0 ... x{rank}_{max_hop - 1}``).
+
+    Raises
+    ------
+    ValueError
+        At construction, when ``encoder.fuse_pse2cell`` is truthy (the
+        fused ``x_{rank}`` would make hop-masking a structural no-op;
+        see above), or when an encoded tensor ``x{rank}_{hop}`` needed
+        by a player is missing after encoding.
     """
 
     def __init__(
@@ -370,6 +393,19 @@ class HopseCellMaskingGame:
         encoder,
         max_hop: int,
     ):
+        if getattr(encoder, "fuse_pse2cell", False):
+            raise ValueError(
+                "encoder has fuse_pse2cell=True: it writes a fused "
+                "x_{rank} from the per-hop encodings at encode time, and "
+                "fused-mode models read that tensor instead of the "
+                "per-hop tensors. HopseCellMaskingGame masks "
+                "x{rank}_{hop} AFTER the single encoding pass, so the "
+                "fused x_{rank} is never recomputed and masking would "
+                "never reach the computation (v(full) == v(empty) "
+                "exactly, all Shapley values 0). Use CellMaskingGame "
+                "with encoder=<this encoder> instead: it masks the "
+                "encoded x_{rank} rows a fused-mode model actually reads"
+            )
         self.model_fn = model_fn
         self.players = players
         self.max_hop = max_hop

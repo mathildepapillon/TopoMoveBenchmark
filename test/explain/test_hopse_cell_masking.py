@@ -216,3 +216,117 @@ def test_hopse_game_efficiency():
     )
     phi = shapley_values(game, len(players))
     check_efficiency(phi, game, len(players), atol=1e-4)
+
+
+# ------------------------------------------------ the REAL HOPSE encoder
+
+REAL_IN, REAL_OUT, REAL_N0 = 3, 4, 4
+
+
+def real_hopse_parts(fuse_pse2cell=False, seed=11):
+    """Smallest constructible setup around the real HOPSEFeatureEncoder.
+
+    One dimension (rank 0), two hops, four nodes. The batch is a PyG
+    ``Data`` object because the encoder's forward uses item access
+    (``data["x0_0"]``) alongside attribute access (``data.batch_0``).
+
+    Parameters
+    ----------
+    fuse_pse2cell : bool
+        Whether the encoder also writes the fused ``x_0`` at encode time.
+    seed : int
+        Seed for the raw per-hop features and the model weights.
+
+    Returns
+    -------
+    tuple
+        (encoder, batch, model_fn, players); model_fn reads the per-hop
+        tensors the way HOPSEWrapper assembles its backbone input.
+    """
+    from torch_geometric.data import Data
+
+    from topobench.nn.encoders.hopse_encoder import HOPSEFeatureEncoder
+
+    torch.manual_seed(seed)
+    encoder = HOPSEFeatureEncoder(
+        in_channels=[[REAL_IN] * MAX_HOP],
+        out_channels=REAL_OUT,
+        max_hop=MAX_HOP,
+        fuse_pse2cell=fuse_pse2cell,
+    )
+    encoder.eval()
+
+    g = torch.Generator().manual_seed(seed + 1)
+    batch = Data(
+        batch_0=torch.zeros(REAL_N0, dtype=torch.long),
+        **{
+            f"x0_{hop}": torch.randn(REAL_N0, REAL_IN, generator=g)
+            for hop in range(MAX_HOP)
+        },
+    )
+
+    head = torch.nn.Linear(REAL_OUT, 1)
+
+    def model_fn(b):
+        # what HOPSEWrapper does: assemble the input from x{rank}_{hop}
+        pooled = sum(
+            getattr(b, f"x0_{hop}").mean(dim=0) for hop in range(MAX_HOP)
+        )
+        return head(torch.tanh(pooled)).squeeze()
+
+    players = [CellPlayer(rank=0, index=i) for i in range(REAL_N0)]
+    return encoder, batch, model_fn, players
+
+
+def test_hopse_game_against_the_real_encoder():
+    """The game is live on the real HOPSEFeatureEncoder and satisfies
+    efficiency with exact Shapley values."""
+    encoder, batch, model_fn, players = real_hopse_parts()
+    game = CachedGame(
+        n_players=len(players),
+        evaluate=HopseCellMaskingGame(
+            model_fn, batch, players, encoder=encoder, max_hop=MAX_HOP
+        ),
+    )
+    full = (1 << len(players)) - 1
+    assert game(full) != game(0)
+    phi = shapley_values(game, len(players))
+    check_efficiency(phi, game, len(players), atol=1e-4)
+
+
+def test_fused_encoder_is_refused_with_instructions():
+    """fuse_pse2cell=True encoders must be refused at construction.
+
+    In fused mode the encoder writes a fused ``x_0`` from the per-hop
+    encodings at encode time, and fused-mode models (the graph HOPSE
+    configs wrap a plain GNN reading ``batch.x_0``) consume that tensor.
+    Post-encoding hop-masking never recomputes it, so the game would be
+    a structural no-op; the error must name the working alternative.
+    """
+    encoder, batch, model_fn, players = real_hopse_parts(
+        fuse_pse2cell=True
+    )
+    with pytest.raises(ValueError, match="fuse_pse2cell.*CellMaskingGame"):
+        HopseCellMaskingGame(
+            model_fn, batch, players, encoder=encoder, max_hop=MAX_HOP
+        )
+
+
+def test_fused_encoder_works_through_the_plain_game():
+    """The refusal's instruction is honest: CellMaskingGame with the
+    fused encoder masks the fused ``x_0`` rows a fused-mode model reads,
+    and that game is live."""
+    encoder, batch, _, players = real_hopse_parts(fuse_pse2cell=True)
+
+    torch.manual_seed(13)
+    head = torch.nn.Linear(REAL_OUT, 1)
+
+    def fused_model_fn(b):
+        # what GNNWrapper-style fused models do: read only x_0
+        return head(torch.tanh(b.x_0.mean(dim=0))).squeeze()
+
+    game = CellMaskingGame(
+        fused_model_fn, batch, players, baseline="zeros", encoder=encoder
+    )
+    full = (1 << len(players)) - 1
+    assert game(full) != game(0)

@@ -201,3 +201,123 @@ def test_missing_player_rank_error_names_available_ranks():
         ValueError, match=r"ranks \[1\].*available ranks: \[0\]"
     ):
         CellMaskingGame(model_fn, batch, players)
+
+
+# ----------------------------------------------- sampled regime, real games
+
+
+def nonlinear_cell_parts(seed=0):
+    """A genuinely nonlinear cell game on the two-triangle complex.
+
+    The model pools every rank's features and mixes them through a tanh
+    MLP, so marginal contributions depend on the coalition — unlike the
+    additive fixture, the sampled estimator here has real variance and
+    approximates rather than reproduces the exact values.
+
+    Parameters
+    ----------
+    seed : int
+        Seed for the batch features and the model weights.
+
+    Returns
+    -------
+    tuple
+        (batch, model_fn, players) with 6 players (4 nodes + 2 faces).
+    """
+    from test.explain.fixtures import two_triangle_batch
+
+    batch = two_triangle_batch(channels=4, seed=seed)
+    torch.manual_seed(seed + 1)
+    mix = torch.nn.Linear(3 * 4, 8)
+    head = torch.nn.Linear(8, 1)
+
+    def model_fn(b):
+        pooled = torch.cat(
+            [b.x_0.mean(dim=0), b.x_1.mean(dim=0), b.x_2.mean(dim=0)]
+        )
+        return head(torch.tanh(mix(pooled))).squeeze()
+
+    players = [CellPlayer(rank=0, index=i) for i in range(4)] + [
+        CellPlayer(rank=2, index=j) for j in range(2)
+    ]
+    return batch, model_fn, players
+
+
+def test_sampled_phi_approximates_exact_phi_on_a_real_cell_game():
+    """On an overlapping small case, sampling must approach exactness.
+
+    The same 6-player nonlinear cell game is solved exactly (64
+    evaluations) and by permutation sampling forced via a small
+    max_exact_evaluations cap; the sampled values must approximate the
+    exact ones well within the exact attribution scale.
+    """
+    batch, model_fn, players = nonlinear_cell_parts(seed=2)
+    exact = explain_cells(
+        model_fn, batch, players, baseline="zeros"
+    )
+    assert exact.exact and exact.evaluations == 1 << 6
+
+    with pytest.warns(UserWarning, match="max_exact_evaluations"):
+        sampled = explain_cells(
+            model_fn,
+            batch,
+            players,
+            baseline="zeros",
+            passes=512,
+            seed=0,
+            max_exact_evaluations=32,
+        )
+    assert not sampled.exact
+    scale = float(np.abs(exact.phi).max())
+    assert scale > 0
+    assert np.allclose(sampled.phi, exact.phi, atol=0.1 * scale)
+    # efficiency holds for both (exactly for the exact values, to the
+    # estimator's construction for the sampled ones)
+    assert np.isclose(sampled.phi.sum(), exact.phi.sum(), atol=1e-6)
+
+
+def test_sampled_regime_engages_silently_beyond_the_player_limit():
+    """21 players (> EXACT_PLAYER_LIMIT) sample without any cap warning.
+
+    The per-row tanh model is nonlinear per cell but additive across
+    cells, so the sampled estimator is exact per pass and the closed
+    form phi_i = tanh(sum(row_i)) is asserted at tight tolerance.
+    """
+    g = torch.Generator().manual_seed(4)
+    batch = SimpleNamespace(x_0=torch.randn(21, 2, generator=g))
+    players = [CellPlayer(rank=0, index=i) for i in range(21)]
+
+    def model_fn(b):
+        return torch.tanh(b.x_0.sum(dim=1)).sum()
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        explanation = explain_cells(
+            model_fn, batch, players, baseline="zeros", passes=8, seed=0
+        )
+    assert not explanation.exact
+    assert explanation.evaluations <= 8 * 21 + 1
+    expected = torch.tanh(batch.x_0.sum(dim=1)).numpy()
+    assert np.allclose(explanation.phi, expected, atol=1e-5)
+
+
+def test_cached_game_budget_is_honored_on_a_real_cell_game():
+    """A CachedGame budget prices sampling and stops it when exhausted."""
+    from topobench.explain import CachedGame, sampled_shapley
+
+    batch, model_fn, players = nonlinear_cell_parts(seed=6)
+    n = len(players)
+    raw = CellMaskingGame(model_fn, batch, players, baseline="zeros")
+
+    # generous budget: sampling completes and stays within it
+    budget = 4 * n + 1
+    game = CachedGame(n_players=n, evaluate=raw, budget=budget)
+    att = sampled_shapley(game, n, passes=4, seed=0)
+    assert 0 < game.calls <= budget
+    assert att.passes == 4
+
+    # tight budget: the run must stop with the budget in the message
+    tight = CachedGame(n_players=n, evaluate=raw, budget=3)
+    with pytest.raises(RuntimeError, match="budget 3 exhausted"):
+        sampled_shapley(tight, n, passes=4, seed=0)
+    assert tight.calls <= 3
