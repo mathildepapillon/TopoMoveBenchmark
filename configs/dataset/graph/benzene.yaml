@@ -1,0 +1,40 @@
+# GraphXAI molecular dataset with ground-truth explanation masks (Agarwal et al., 2023).
+# Dataset loader config
+loader:
+  _target_: topobench.data.loaders.GraphXAIDatasetLoader
+  parameters:
+    data_domain: graph
+    data_type: GraphXAI
+    data_name: Benzene
+    data_dir: ${paths.data_dir}/${dataset.loader.parameters.data_domain}/${dataset.loader.parameters.data_type}/${dataset.loader.parameters.data_name}
+    raw_data_dir: null  # optional directory of pre-staged GraphXAI .npz archives
+    downsample_seed: 42
+
+# Dataset parameters
+parameters:
+  num_features: 14  # one-hot atom type
+  num_classes: 2
+  task: classification
+  loss_type: cross_entropy
+  monitor_metric: accuracy
+  task_level: graph
+  # Lifting parameters
+  max_dim_if_lifted: 2
+  # Ground-truth masks live on nodes/edges of the original graph; edge features are not
+  # carried into the complex, so every rank gets ProjectionSum features of equal width.
+  preserve_edge_attr_if_lifted: False
+
+#splits
+split_params:
+  learning_setting: inductive
+  data_split_dir: ${paths.data_dir}/data_splits/${dataset.loader.parameters.data_name}
+  data_seed: 0
+  split_type: random
+  k: 10
+  train_prop: 0.7
+
+# Dataloader parameters
+dataloader_params:
+  batch_size: 64
+  num_workers: 0
+  pin_memory: False
