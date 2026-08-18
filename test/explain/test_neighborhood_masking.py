@@ -194,6 +194,71 @@ def test_coalition_context_restores_mask():
             pass
 
 
+def test_unwrap_restores_the_original_backbone_method():
+    """unwrap() must undo the wrap-time mutation of the backbone.
+
+    Wrapping mutates the backbone's ``aggregate_inter_nbhd`` in place, so
+    the mask reaches even direct calls to the backbone; unwrap must
+    restore the original bound method bit for bit in behavior, after
+    which the backbone may be wrapped again.
+    """
+    plain = make_backbone()
+    ref = forward_out(plain, two_triangle_batch(seed=0))
+
+    backbone = make_backbone()
+    wrapped = CoalitionMaskedBackbone(backbone)
+    wrapped.coalition_mask = 0b1
+    # the mutation outlives the wrapper: direct backbone calls are masked
+    masked_direct = forward_out(backbone, two_triangle_batch(seed=0))
+    assert any(
+        not torch.allclose(ref[rank], masked_direct[rank], atol=1e-6)
+        for rank in ref
+    )
+
+    returned = wrapped.unwrap()
+    assert returned is backbone
+    assert not getattr(
+        backbone.aggregate_inter_nbhd, "_coalition_masked", False
+    )
+    restored = forward_out(backbone, two_triangle_batch(seed=0))
+    for rank in ref:
+        assert torch.allclose(ref[rank], restored[rank], atol=1e-6)
+
+    # idempotent, and re-wrapping after unwrap is allowed
+    wrapped.unwrap()
+    CoalitionMaskedBackbone(backbone).unwrap()
+
+
+def test_context_manager_unwraps_on_exit():
+    """The with-form must restore the backbone when the block exits."""
+    plain = make_backbone()
+    ref = forward_out(plain, two_triangle_batch(seed=0))
+
+    backbone = make_backbone()
+    with CoalitionMaskedBackbone(backbone) as wrapped:
+        assert wrapped.players == NEIGHBORHOODS
+        with wrapped.coalition(0b1):
+            masked_out = forward_out(wrapped, two_triangle_batch(seed=0))
+        assert any(
+            not torch.allclose(ref[rank], masked_out[rank], atol=1e-6)
+            for rank in ref
+        )
+    assert not getattr(
+        backbone.aggregate_inter_nbhd, "_coalition_masked", False
+    )
+    restored = forward_out(backbone, two_triangle_batch(seed=0))
+    for rank in ref:
+        assert torch.allclose(ref[rank], restored[rank], atol=1e-6)
+
+
+def test_double_wrapping_raises():
+    """Wrapping an already-masked backbone must be refused loudly."""
+    backbone = make_backbone()
+    CoalitionMaskedBackbone(backbone)
+    with pytest.raises(ValueError, match="already wrapped"):
+        CoalitionMaskedBackbone(backbone)
+
+
 def test_prune_keeps_trained_weights():
     """Pruning must keep the kept routes' weights bit for bit."""
     backbone = make_backbone(template_seed=3, weight_seed=4)

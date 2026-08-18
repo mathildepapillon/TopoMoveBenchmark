@@ -81,29 +81,103 @@ def mask_to_coalition(
 class CoalitionMaskedBackbone(torch.nn.Module):
     """Wrap a TopoTune backbone so forward() respects a coalition mask.
 
-    The wrapper replaces the backbone's ``aggregate_inter_nbhd`` with a
-    version that drops the contribution of routes whose neighborhood bit is
-    absent from :attr:`coalition_mask`. The backbone's neighborhood list is
-    captured at wrap time and exposed as :attr:`players`; bit ``i`` of a
-    coalition mask corresponds to ``players[i]``. The default mask is the
-    grand coalition, under which the wrapper is equivalent to the unwrapped
-    backbone.
+    The wrapper MUTATES the wrapped backbone: it replaces the backbone's
+    ``aggregate_inter_nbhd`` (in place, on the backbone object itself) with
+    a version that drops the contribution of routes whose neighborhood bit
+    is absent from :attr:`coalition_mask`. The mutation outlives the
+    wrapper — the backbone stays masked even when called directly, until
+    :meth:`unwrap` restores the original method. Use the wrapper as a
+    context manager (``with CoalitionMaskedBackbone(backbone) as wrapped:``)
+    to have :meth:`unwrap` called automatically, and wrap the same backbone
+    at most once: wrapping an already-masked backbone raises.
+
+    The backbone's neighborhood list is captured at wrap time and exposed
+    as :attr:`players`; bit ``i`` of a coalition mask corresponds to
+    ``players[i]``. The default mask is the grand coalition, under which
+    the wrapper is equivalent to the unwrapped backbone.
 
     Parameters
     ----------
     backbone : torch.nn.Module
         A TopoTune backbone exposing ``neighborhoods``, ``routes`` and
         ``aggregate_inter_nbhd``.
+
+    Raises
+    ------
+    ValueError
+        If the backbone's ``aggregate_inter_nbhd`` is already a masked
+        replacement installed by another wrapper — double-wrapping would
+        chain masks silently.
     """
 
     def __init__(self, backbone: torch.nn.Module):
         super().__init__()
+        if getattr(backbone.aggregate_inter_nbhd, "_coalition_masked", False):
+            raise ValueError(
+                "backbone is already wrapped by a CoalitionMaskedBackbone; "
+                "unwrap() the existing wrapper before wrapping again"
+            )
         self.backbone = backbone
         #: Player order captured at wrap time; bit i = players[i].
         self.players: list[str] = list(backbone.neighborhoods)
         self.coalition_mask: int = self.full_mask
         self._original_aggregate = backbone.aggregate_inter_nbhd
-        backbone.aggregate_inter_nbhd = self._masked_aggregate
+
+        def masked_aggregate(x_out_per_route: dict) -> dict:
+            return self._masked_aggregate(x_out_per_route)
+
+        # Marker so a second wrap is detectable (see the raise above).
+        masked_aggregate._coalition_masked = True
+        backbone.aggregate_inter_nbhd = masked_aggregate
+
+    def unwrap(self) -> torch.nn.Module:
+        """Restore the backbone's original ``aggregate_inter_nbhd``.
+
+        Undoes the wrap-time mutation, returning the backbone to its
+        unmasked behavior; it can then be wrapped again. Idempotent — a
+        second call is a no-op. The wrapper itself keeps functioning as a
+        plain pass-through afterwards (its ``forward`` no longer masks).
+
+        Returns
+        -------
+        torch.nn.Module
+            The unwrapped backbone.
+        """
+        if getattr(
+            self.backbone.aggregate_inter_nbhd, "_coalition_masked", False
+        ):
+            self.backbone.aggregate_inter_nbhd = self._original_aggregate
+        return self.backbone
+
+    def __enter__(self):
+        """Enter the context manager form of the wrapper.
+
+        Returns
+        -------
+        CoalitionMaskedBackbone
+            This wrapper.
+        """
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Restore the backbone's original method on context exit.
+
+        Parameters
+        ----------
+        exc_type : type or None
+            Exception type, if any.
+        exc_value : BaseException or None
+            Exception instance, if any.
+        traceback : types.TracebackType or None
+            Traceback, if any.
+
+        Returns
+        -------
+        bool
+            False, so exceptions propagate.
+        """
+        self.unwrap()
+        return False
 
     @property
     def full_mask(self) -> int:
