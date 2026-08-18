@@ -128,10 +128,14 @@ class CellMaskingGame:
     Raises
     ------
     ValueError
-        If the resolved baseline rows equal the original feature rows on
-        every player rank — the game would then be constant (every
-        coalition identical, all Shapley values exactly 0), so the
-        degenerate setup is refused at construction.
+        At construction, when the setup cannot yield a meaningful game:
+        the batch exposes no ``x_{rank}`` feature matrices at all, or a
+        player references a rank the batch has no features for; a custom
+        baseline dict names ranks that are not player ranks, or an entry's
+        shape does not match the rank's feature width; or the resolved
+        baseline rows equal the original feature rows on every player
+        rank — the game would then be constant (every coalition identical,
+        all Shapley values exactly 0).
     """
 
     def __init__(
@@ -153,15 +157,30 @@ class CellMaskingGame:
         # Snapshot EVERY rank's features, not just player ranks: backbones
         # such as TopoTune overwrite batch.x_{rank} with hidden states
         # during forward, so each evaluation must start from pristine
-        # features on all ranks.
-        self._originals = {}
+        # features on all ranks. Ranks are discovered both by counting up
+        # from x_0 and from the players' own ranks, so a batch without
+        # rank-0 features (e.g. edge-only features) is still handled.
+        ranks = set()
         rank = 0
         while hasattr(batch, f"x_{rank}"):
-            self._originals[rank] = getattr(batch, f"x_{rank}").clone()
+            ranks.add(rank)
             rank += 1
+        ranks.update(p.rank for p in players if hasattr(batch, f"x_{p.rank}"))
+        self._originals = {
+            r: getattr(batch, f"x_{r}").clone() for r in sorted(ranks)
+        }
+        if not self._originals:
+            raise ValueError(
+                "batch has no x_{rank} feature matrices at all: no x_0, "
+                "x_1, ... attribute exists. CellMaskingGame masks per-rank "
+                "feature rows, so the batch must expose them"
+            )
         missing = {p.rank for p in players} - set(self._originals)
         if missing:
-            raise ValueError(f"batch has no features for ranks {missing}")
+            raise ValueError(
+                f"batch has no features for ranks {sorted(missing)}; "
+                f"available ranks: {sorted(self._originals)}"
+            )
 
         if baseline is None:
             baseline = "complex_mean" if encoder is not None else "zeros"
@@ -176,10 +195,18 @@ class CellMaskingGame:
                 r: self._originals[r].mean(0) for r in player_ranks
             }
         elif isinstance(baseline, dict):
+            unknown = set(baseline) - player_ranks
+            if unknown:
+                raise ValueError(
+                    f"baseline has entries for ranks {sorted(unknown)}, "
+                    "which are not player ranks; valid ranks are "
+                    f"{sorted(player_ranks)}"
+                )
             self.baseline = {
                 r: fill.to(self._originals[r].dtype)
                 for r, fill in baseline.items()
             }
+            self._validate_baseline_shapes()
         else:
             raise ValueError(f"unknown baseline {baseline!r}")
 
@@ -199,6 +226,40 @@ class CellMaskingGame:
                 "features are constant); pass a baseline that differs from "
                 'the features, such as baseline="zeros"'
             )
+
+    def _validate_baseline_shapes(self) -> None:
+        """Validate custom baseline entries against the feature shapes.
+
+        Raises
+        ------
+        ValueError
+            If a per-rank baseline row does not match the rank's feature
+            width, a per-cell replacement matrix does not match the
+            rank's feature shape, or an entry has an unsupported number
+            of dimensions.
+        """
+        for r, fill in self.baseline.items():
+            original = self._originals[r]
+            if fill.dim() == 1:
+                if fill.shape[0] != original.shape[1]:
+                    raise ValueError(
+                        f"baseline row for rank {r} has width "
+                        f"{fill.shape[0]}, but rank-{r} features have "
+                        f"width {original.shape[1]}"
+                    )
+            elif fill.dim() == 2:
+                if fill.shape != original.shape:
+                    raise ValueError(
+                        f"per-cell baseline for rank {r} has shape "
+                        f"{tuple(fill.shape)}, but rank-{r} features "
+                        f"have shape {tuple(original.shape)}"
+                    )
+            else:
+                raise ValueError(
+                    f"baseline for rank {r} must be one row of shape "
+                    f"[{original.shape[1]}] or a per-cell matrix of shape "
+                    f"{tuple(original.shape)}, got a {fill.dim()}-d tensor"
+                )
 
     def _baseline_equals_originals(self, rank: int) -> bool:
         """Check whether masking rows of ``rank`` would replace them with
