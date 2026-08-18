@@ -274,7 +274,26 @@ We list the neural networks trained and evaluated by `TopoBench`, organized by t
 
 ### Explainability (TopoSHAP)
 
-`TopoBench` includes `topobench.explain`, a Shapley-based explainability toolkit for topological models. It answers two practitioner questions: *which cells drive this prediction?* — via exact (or permutation-sampled) Shapley values over the cells of a complex — and *which neighborhoods earn their compute?* — via coalition-masking games over a TopoTune backbone's message-passing neighborhoods, with subset selectors (top-k, anchored, greedy, and automatic-size rules) and in-place pruning to continue training on the selected coalition. `run_ladder` packages neighborhood selection into one fixed pipeline (all-players stem -> backward-elimination ladder on the masked validation game -> train B rungs -> validation selects) that works for any model family via caller-supplied train/eval callables. Every attribution can be audited with executable axiom checks (efficiency, null players, symmetry, batch invariance). See the [explainability tutorial](https://github.com/geometric-intelligence/TopoBench/blob/main/tutorials/tutorial_explain.ipynb) for an end-to-end example.
+`TopoBench` includes `topobench.explain`, a Shapley-based explainability toolkit for topological models. It answers two practitioner questions: *which cells drive this prediction?* — via exact (or permutation-sampled) Shapley values over the cells of a complex — and *which neighborhoods earn their compute?* — via coalition-masking games over a TopoTune backbone's message-passing neighborhoods, with subset selectors (top-k, anchored, greedy, and automatic-size rules) and in-place pruning to continue training on the selected coalition. `run_ladder` packages neighborhood selection into one fixed pipeline (all-players stem -> backward-elimination ladder on the masked validation game -> train B rungs -> validation selects) that works for any model family via caller-supplied train/eval callables. Every attribution can be audited with executable axiom checks (efficiency, null players, symmetry, batch invariance).
+
+Explaining one prediction takes a scalar-valued model function and a list of cells to attribute it to:
+
+```python
+import torch
+from topobench.explain import CellPlayer, explain_cells
+
+
+def predicted_logit(batch):  # the scalar being explained
+    with torch.no_grad():
+        return model(batch)
+
+
+players = [CellPlayer(rank=0, index=i) for i in range(n_nodes)]
+explanation = explain_cells(predicted_logit, batch, players)
+print(explanation.phi)  # one Shapley value per cell (exact when affordable)
+```
+
+See the [explainability tutorial](tutorials/tutorial_explain.ipynb) for an end-to-end example.
 
 
 ## :rocket: Liftings and Transforms
@@ -398,6 +417,10 @@ Specially useful in pre-processing steps, these are the general data manipulatio
 | Tolokers | Classification | Heterophilic dataset. | [Source](https://arxiv.org/pdf/2302.11640) |
 | US-county-demos | Regression | In turn each node attribute is used as the target label. | [Source](https://arxiv.org/pdf/2002.08274) |
 | ZINC | Regression | Graph-level regression. | [Source](https://pubs.acs.org/doi/10.1021/ci3001277) |
+| Benzene | Classification | Graph-level classification with ground-truth explanation masks (GraphXAI). | [Source](https://www.nature.com/articles/s41597-023-01974-x) |
+| AlkaneCarbonyl | Classification | Graph-level classification with ground-truth explanation masks (GraphXAI). | [Source](https://www.nature.com/articles/s41597-023-01974-x) |
+| FluorideCarbonyl | Classification | Graph-level classification with ground-truth explanation masks (GraphXAI). | [Source](https://www.nature.com/articles/s41597-023-01974-x) |
+| Mutagenicity | Classification | Graph-level classification with ground-truth explanation masks (GraphXAI). | [Source](https://www.nature.com/articles/s41597-023-01974-x) |
 
 **Remark:** GraphUniverse is a synthetic graph generator for community-structured data, enabling control over graph properties like homophily, feature-signal and degree structure. Live Demo: [Demo](https://graphuniverse.streamlit.app/). Package release: [PyPi](https://pypi.org/project/graph-universe/0.1.2/). GitHub repository: [Repo](https://github.com/LouisVanLangendonck/GraphUniverse).
 
