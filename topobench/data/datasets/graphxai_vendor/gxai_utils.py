@@ -1,6 +1,7 @@
 """Vendored helpers from GraphXAI (mims-harvard/GraphXAI), MIT License, (c) 2023 GraphXAI.
 
-Adapted from ``graphxai/utils/misc.py`` and ``graphxai/utils/nx_conversion.py``. The
+Adapted from ``graphxai/utils/misc.py`` and ``graphxai/utils/nx_conversion.py`` at
+upstream commit a11e65ffbc4df737f35522a8accf2283a8aeaa37. The
 functions are kept semantically identical to the originals, because the ground-truth
 explanation masks of the GraphXAI datasets are *defined* by them: an edge is part of an
 explanation exactly when the original code says it is. Only vectorization and docstring

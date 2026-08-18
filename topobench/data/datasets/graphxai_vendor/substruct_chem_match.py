@@ -1,7 +1,7 @@
 """Vendored from GraphXAI (mims-harvard/GraphXAI), MIT License, Copyright (c) 2023 GraphXAI.
 
-Source: ``graphxai/datasets/utils/substruct_chem_match.py`` at the upstream repository
-HEAD. Copied verbatim so the Mutagenicity ground-truth explanation masks are
+Source: ``graphxai/datasets/utils/substruct_chem_match.py`` at upstream commit
+a11e65ffbc4df737f35522a8accf2283a8aeaa37. Copied verbatim so the Mutagenicity ground-truth explanation masks are
 reproduced by the original substructure-matching rules (NH2, NO2, aliphatic halide,
 nitroso, azo-type) rather than a re-implementation. Unused helpers are retained as-is.
 """

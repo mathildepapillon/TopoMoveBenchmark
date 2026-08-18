@@ -52,6 +52,11 @@ NPZ_DATASETS = {
 #: union, and the complete subset lattice only when it stays below this bound.
 MAX_GT_CANDIDATES = 32
 
+#: Commit of mims-harvard/GraphXAI that the download URLs and the vendored
+#: helpers are pinned to, so the datasets stay reproducible even if the
+#: upstream main branch moves.
+GRAPHXAI_COMMIT = "a11e65ffbc4df737f35522a8accf2283a8aeaa37"
+
 
 class GraphXAIDataset(InMemoryDataset):
     r"""GraphXAI molecular dataset with ground-truth explanation masks.
@@ -86,7 +91,8 @@ class GraphXAIDataset(InMemoryDataset):
 
     URLS: ClassVar[dict[str, str]] = {
         name: (
-            "https://github.com/mims-harvard/GraphXAI/raw/main/"
+            "https://raw.githubusercontent.com/mims-harvard/GraphXAI/"
+            f"{GRAPHXAI_COMMIT}/"
             f"graphxai/datasets/real_world/{filename[: -len('.npz')]}/{filename}"
         )
         for name, filename in NPZ_DATASETS.items()
