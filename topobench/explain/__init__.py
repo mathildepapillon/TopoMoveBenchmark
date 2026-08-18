@@ -17,8 +17,11 @@ each coalition. Two uses are supported:
   :func:`sampled_shapley`, select a coalition (top-k, anchored, greedy, or
   an automatic-size rule), then :func:`prune_backbone_` and keep training.
 
-Every attribution can be audited with the executable axiom checks in
-:mod:`topobench.explain.axioms`.
+For end-to-end neighborhood selection, :func:`run_ladder` packages the
+performance game into one fixed pipeline: all-players stem ->
+backward-elimination ladder on the masked validation game -> train B
+rungs -> validation selects. Every attribution can be audited with the
+executable axiom checks in :mod:`topobench.explain.axioms`.
 """
 
 from .axioms import (
@@ -36,6 +39,13 @@ from .cells import (
     explain_cells,
 )
 from .games import CachedGame, Game, TabulatedGame
+from .ladder import (
+    LadderResult,
+    LadderRung,
+    backward_elimination_ladder,
+    binomial_se,
+    run_ladder,
+)
 from .neighborhoods import (
     CoalitionMaskedBackbone,
     coalition_to_mask,
@@ -71,10 +81,14 @@ __all__ = [
     "CoalitionMaskedBackbone",
     "Game",
     "HopseCellMaskingGame",
+    "LadderResult",
+    "LadderRung",
     "SampledAttribution",
     "SubmodularityCensus",
     "TabulatedGame",
     "anchored_top_k_mask",
+    "backward_elimination_ladder",
+    "binomial_se",
     "check_batch_invariance",
     "check_efficiency",
     "check_symmetry_pair",
@@ -88,6 +102,7 @@ __all__ = [
     "mask_to_coalition",
     "prune_backbone_",
     "resample_pick_stability",
+    "run_ladder",
     "sampled_shapley",
     "shapley_interaction",
     "shapley_values",
