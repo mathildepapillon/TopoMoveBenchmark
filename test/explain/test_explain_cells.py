@@ -7,6 +7,7 @@ contribution of player i equals its row sum). That makes regime behavior
 checkable without tolerance games.
 """
 
+import warnings
 from types import SimpleNamespace
 
 import numpy as np
@@ -86,8 +87,6 @@ def test_explicit_high_cap_restores_exactness():
 
 def test_within_cap_stays_exact_and_silent():
     """Under the cap the exact regime runs without any warning."""
-    import warnings
-
     batch, model_fn, players = additive_parts(n_cells=6)
     with warnings.catch_warnings():
         warnings.simplefilter("error")
@@ -103,3 +102,31 @@ def test_interactions_refused_when_cap_forces_sampling():
         explain_cells(
             model_fn, batch, players, interactions=True, baseline="zeros"
         )
+
+
+def test_constant_game_diagnostic():
+    """A structurally inert game must warn; a live game must not.
+
+    A HOPSE-style model reads only the per-hop tensors ``x{rank}_{hop}``,
+    so the plain game's masking of ``x_{rank}`` never reaches the
+    computation: v(full) == v(empty) exactly and every Shapley value is
+    0. explain_cells must warn loudly, naming HopseCellMaskingGame as the
+    fix; a model that does read ``x_{rank}`` must run warning-free.
+    """
+    from test.explain.test_hopse_cell_masking import (
+        hopse_batch,
+        make_game_parts,
+    )
+
+    encoder, model_fn, players = make_game_parts()
+    with pytest.warns(UserWarning, match="HopseCellMaskingGame"):
+        explanation = explain_cells(
+            model_fn, hopse_batch(seed=3), players, encoder=encoder
+        )
+    assert np.allclose(explanation.phi, 0.0)
+
+    # a normal model (reads x_0) does not trigger the diagnostic
+    batch, sum_model_fn, sum_players = additive_parts(n_cells=6)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        explain_cells(sum_model_fn, batch, sum_players, baseline="zeros")

@@ -411,6 +411,23 @@ def explain_cells(
     )
     game = CachedGame(n_players=n, evaluate=raw_game)
 
+    # Constant-game diagnostic: if masking every player changes nothing,
+    # the game is (as far as these two coalitions show) constant and all
+    # Shapley values will be 0. Both evaluations land in the cache, so
+    # the estimators below reuse them for free.
+    full_mask = (1 << n) - 1
+    if game(full_mask) == game(0):
+        warnings.warn(
+            "v(full) == v(empty) exactly: masking every player did not "
+            "change the model output, so the game looks constant and all "
+            "Shapley values will be 0. Known cause: the model may not "
+            "read x_{rank} — per-hop-encoding models (HOPSE) need "
+            "HopseCellMaskingGame, which masks the x{rank}_{hop} tensors "
+            "they actually consume. (A genuinely null model also produces "
+            "this, which is why it is a warning, not an error.)",
+            stacklevel=2,
+        )
+
     if n <= EXACT_PLAYER_LIMIT and (1 << n) <= max_exact_evaluations:
         phi = shapley_values(game, n)
         inter = shapley_interaction(game, n, order=2) if interactions else None
