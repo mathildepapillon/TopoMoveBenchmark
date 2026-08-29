@@ -1,0 +1,140 @@
+% ======================================================================
+% Section 4 -- METHOD (~2 page budget). Direct register, no em dashes.
+% ======================================================================
+\section{Method: One Game, Two Outputs}
+\label{sec:framework}
+
+\method plays one cooperative game and reads two answers from it. The
+players are the cells of the input complex. The value of a coalition is
+the model's output when only those cells participate. The game returns
+\emph{attributions} (per-cell Shapley values, \cref{eq:shapley}) and an
+\emph{explanation} (the smallest sufficient sub-complex). The same
+template, with neighborhoods as players and validation accuracy as the
+value, explains \emph{performance} (\cref{sec:framework-game2}).
+
+\subsection{The Participation Game}
+\label{sec:framework-game1}
+
+To explain a prediction $f(\mathcal{C})$ for class $y$, the players are
+the cells $P \subseteq \mathcal{X}$ of the input, by default all cells,
+with $n = |P|$. A coalition $S$ is scored on the \emph{induced
+sub-complex} $\mathcal{C}[S]$: cells outside $S$ are detached, meaning
+their features are removed, every neighborhood matrix is recomputed
+from the restricted incidences, and readout pooling is limited to $S$:
+\begin{equation}
+\label{eq:participation-game}
+v(S) \;=\;
+  f_{y}\bigl(\mathcal{C}[S]\bigr) - f_{y}\bigl(\mathcal{C}[\emptyset]\bigr).
+\end{equation}
+Detachment is what absence means for a cell. Zeroing features instead
+leaves the cell in place, still passing messages and still contributing
+bias terms to pooling, so a zeroed game scores a different
+counterfactual (quantified in \cref{app:experimental}). Detachment is
+also cell-native: removing a face removes the rank-2 player itself.
+
+\paragraph{Output 1: attributions.}
+Shapley values $\phi_\sigma(v)$ on \cref{eq:participation-game} give
+signed per-cell credit with the axioms of \cref{sec:prelim-shapley}.
+Efficiency decomposes the prediction over cells, and the null-player
+axiom detects models that ignore their higher-order structure
+(\cref{sec:predictions}). Small complexes are enumerated exactly.
+Larger ones use $T$ permutation passes, which cost $T \cdot n$ game
+evaluations and are unbiased \citep{castro2009polynomial}.
+
+\paragraph{Output 2: explanations.}
+Motif recovery asks for a sub-complex, so \method extracts one
+directly: the budget-$b$ coalition
+$S^{*}_{b} \approx \argmax_{|S| = b} v(S)$, found by greedy pruning.
+We start from $P$, repeatedly detach the cell whose removal least
+reduces $v$, and record $S$ at every requested budget. One pass costs
+at most $(n^{2}+n)/2$ evaluations of one forward pass each and yields
+the coalition at all budgets, since pruning is nested. Pruning from
+the full complex keeps evaluations near the training distribution.
+Growing coalitions from single cells scores far outside it and fails
+empirically (\cref{app:experimental}).
+
+\paragraph{Relation to graph explainers.}
+A graph is a complex of rank $\le 1$, where
+\cref{eq:participation-game} reduces to induced-subgraph node removal.
+Output 2 then solves the same search problem as SubgraphX
+\citep{yuan2021subgraphx}, with two substitutions: detachment replaces
+feature zero-filling, and exhaustive one-step pruning, at one forward
+pass per scored coalition, replaces Monte-Carlo tree search whose
+reward samples ${\sim}10^{2}$ context coalitions per node it scores.
+Both substitutions are ablated in \cref{sec:predictions}. GNNExplainer
+\citep{ying2019gnnexplainer} and PGExplainer
+\citep{luo2020parameterized} optimize continuous relaxed masks and
+return no game or axioms. All three are defined only at rank $\le 1$.
+
+\subsection{Neighborhoods Explain Performance}
+\label{sec:framework-game2}
+\label{sec:method-pipeline}
+
+The same template explains performance. The players are the model's
+neighborhood-indexed components: a GCCN has one message-passing route
+per neighborhood and HOPSE has one encoding block per neighborhood, so
+switching a player off removes that neighborhood. We propose two value
+functions. The \emph{retraining value} $v_{\mathrm{retrain}}(S)$ is
+the validation accuracy of the model trained from scratch with the
+neighborhoods in $S$; it is exact, and each evaluation costs a full
+training run. The \emph{masked value} $v_{\mathrm{mask}}(S)$ is the
+validation accuracy of a briefly trained full model evaluated with the
+neighborhoods outside $S$ removed; each evaluation costs one forward
+pass over the validation set.
+
+We turn this game into an architecture selection procedure:
+\begin{recipebox}
+  \item We train the full model, with all candidate neighborhoods, for
+    a small fixed number of epochs
+    ($\sim$\unfrozen{\ResStemEpochs}).
+  \item We repeatedly remove the neighborhood whose removal costs the
+    least masked value, while that cost stays below the validation
+    noise floor. This yields one candidate architecture per size.
+  \item We train $B$ of these candidates to completion and keep the
+    one with the best validation accuracy.
+\end{recipebox}
+
+The stop threshold is the binomial noise floor $\sqrt{p(1-p)/m}$ of a
+validation set with $m$ examples, known before any training, so the
+selected size is not a hyperparameter. The budget $B$ trades cost
+against reliability, from $\sim$\unfrozen{\ResLadderCostBOne} training
+runs at $B{=}1$ to $\sim$\unfrozen{\ResLadderCostBTwo} at $B{=}2$; a
+full sweep trains every size. Two rules protect the procedure. The
+masked value only orders candidates, and every accept or reject
+decision is validation of fully trained models. Elimination walks
+downward from the full model, the regime where the masked value is
+most faithful. Details and supporting evidence are in
+\cref{app:selection}.
+
+\subsection{Exactness}
+\label{sec:framework-exact}
+\label{sec:framework-theory}
+
+The neighborhood game has $n = \unfrozen{\ResNumNeighborhoods}$
+players and $2^{n} = 2048$ coalitions, so \cref{eq:shapley,eq:interaction}
+are evaluated exactly. Prediction games on small complexes likewise
+enumerate; larger instances use sampled passes. Against brute force,
+the implementation agrees to \unfrozen{\ResExactnessMaxErr}, which is
+floating-point exactness. Exact axioms double as executable software
+checks; the bugs they caught are documented in
+\cref{app:experimental}.
+
+\begin{theorybox}
+\begin{propositionT}[Non-identifiability of substitutes; statement placeholder]
+% (no \label: unnumbered T-statement; refer to it as "Proposition~T1")
+% TODO(researcher): finalize statement + proof.
+Let $N_a, N_b \in \mathcal{N}$ be neighborhoods that are functionally
+substitutable for a trained model $f_\theta$, i.e., there exist
+parameters realizing the same function with either route active. Then
+the masked value computed on any single trained model cannot
+distinguish the attribution profile of $(N_a, N_b)$ from that of a
+model committed to either substitute. \emph{Exact statement TBD by
+researcher.}
+\end{propositionT}
+\end{theorybox}
+
+Proposition~T1 states which game answers which question: the masked
+value identifies the trained model's realized division of labor, and
+claims about what is realizable under retraining require the
+retraining value. The selection procedure operationalizes this by
+letting validation over trained models decide.

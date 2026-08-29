@@ -1,0 +1,852 @@
+{
+ "benzene_seed45": {
+  "dataset": "benzene",
+  "seed": 45,
+  "mask": 2047,
+  "k": 11,
+  "v_full": 0.9077777777777778,
+  "binomial_se": 0.006819794879231147,
+  "trace": [],
+  "terminated": "stopped_by_rule",
+  "n_cached_masks": 129,
+  "n_leave_one_out_of_full_cached": 7,
+  "missing_candidates_along_path": [
+   {
+    "at_mask": 2047,
+    "missing_bits": [
+     0,
+     3,
+     5,
+     8
+    ]
+   }
+  ]
+ },
+ "benzene_seed46": {
+  "dataset": "benzene",
+  "seed": 46,
+  "mask": 1247,
+  "k": 8,
+  "v_full": 0.9027777777777778,
+  "binomial_se": 0.0069829181152770165,
+  "trace": [
+   [
+    9,
+    0.9094444444444445
+   ],
+   [
+    5,
+    0.9072222222222223
+   ],
+   [
+    8,
+    0.9016666666666666
+   ]
+  ],
+  "terminated": "stopped_by_rule",
+  "n_cached_masks": 123,
+  "n_leave_one_out_of_full_cached": 8,
+  "missing_candidates_along_path": [
+   {
+    "at_mask": 2047,
+    "missing_bits": [
+     2,
+     4,
+     5
+    ]
+   },
+   {
+    "at_mask": 1535,
+    "missing_bits": [
+     0,
+     2,
+     3,
+     4,
+     6,
+     10
+    ]
+   },
+   {
+    "at_mask": 1503,
+    "missing_bits": [
+     0,
+     1,
+     2,
+     3,
+     6,
+     7,
+     10
+    ]
+   },
+   {
+    "at_mask": 1247,
+    "missing_bits": [
+     0,
+     1,
+     2,
+     6,
+     7,
+     10
+    ]
+   }
+  ]
+ },
+ "fluoride_carbonyl_seed45": {
+  "dataset": "fluoride_carbonyl",
+  "seed": 45,
+  "mask": 678,
+  "k": 5,
+  "v_full": 0.8461538461538461,
+  "binomial_se": 0.010006825162892167,
+  "trace": [
+   [
+    3,
+    0.8438461538461538
+   ],
+   [
+    0,
+    0.84
+   ],
+   [
+    4,
+    0.8346153846153846
+   ],
+   [
+    10,
+    0.8346153846153846
+   ],
+   [
+    6,
+    0.8346153846153846
+   ],
+   [
+    8,
+    0.8346153846153846
+   ]
+  ],
+  "terminated": "stopped_by_rule",
+  "n_cached_masks": 132,
+  "n_leave_one_out_of_full_cached": 8,
+  "missing_candidates_along_path": [
+   {
+    "at_mask": 2047,
+    "missing_bits": [
+     4,
+     7,
+     8
+    ]
+   },
+   {
+    "at_mask": 2039,
+    "missing_bits": [
+     1,
+     2,
+     5,
+     6,
+     7,
+     8
+    ]
+   },
+   {
+    "at_mask": 2038,
+    "missing_bits": [
+     1,
+     2,
+     5,
+     7,
+     8,
+     9,
+     10
+    ]
+   },
+   {
+    "at_mask": 2022,
+    "missing_bits": [
+     1,
+     2,
+     5,
+     6,
+     7,
+     8,
+     9
+    ]
+   },
+   {
+    "at_mask": 998,
+    "missing_bits": [
+     1,
+     2,
+     5,
+     7,
+     8,
+     9
+    ]
+   },
+   {
+    "at_mask": 934,
+    "missing_bits": [
+     1,
+     2,
+     5,
+     7,
+     9
+    ]
+   },
+   {
+    "at_mask": 678,
+    "missing_bits": [
+     1,
+     5,
+     7,
+     9
+    ]
+   }
+  ]
+ },
+ "fluoride_carbonyl_seed46": {
+  "dataset": "fluoride_carbonyl",
+  "seed": 46,
+  "mask": 1741,
+  "k": 7,
+  "v_full": 0.8476923076923077,
+  "binomial_se": 0.009965712725741102,
+  "trace": [
+   [
+    4,
+    0.8515384615384616
+   ],
+   [
+    1,
+    0.8461538461538461
+   ],
+   [
+    8,
+    0.8415384615384616
+   ],
+   [
+    5,
+    0.8369230769230769
+   ]
+  ],
+  "terminated": "stopped_by_rule",
+  "n_cached_masks": 129,
+  "n_leave_one_out_of_full_cached": 10,
+  "missing_candidates_along_path": [
+   {
+    "at_mask": 2047,
+    "missing_bits": [
+     3
+    ]
+   },
+   {
+    "at_mask": 2031,
+    "missing_bits": [
+     2,
+     3,
+     5,
+     6,
+     7,
+     8,
+     9
+    ]
+   },
+   {
+    "at_mask": 2029,
+    "missing_bits": [
+     3,
+     5,
+     6,
+     7,
+     9,
+     10
+    ]
+   },
+   {
+    "at_mask": 1773,
+    "missing_bits": [
+     0,
+     3,
+     6,
+     7,
+     9,
+     10
+    ]
+   },
+   {
+    "at_mask": 1741,
+    "missing_bits": [
+     0,
+     2,
+     3,
+     6,
+     9,
+     10
+    ]
+   }
+  ]
+ },
+ "mutagenicity_gxai_seed45": {
+  "dataset": "mutagenicity_gxai",
+  "seed": 45,
+  "mask": 2015,
+  "k": 10,
+  "v_full": 0.9320754716981132,
+  "binomial_se": 0.01545666941068299,
+  "trace": [
+   [
+    5,
+    0.9358490566037736
+   ]
+  ],
+  "terminated": "stopped_by_rule",
+  "n_cached_masks": 133,
+  "n_leave_one_out_of_full_cached": 8,
+  "missing_candidates_along_path": [
+   {
+    "at_mask": 2047,
+    "missing_bits": [
+     0,
+     4,
+     7
+    ]
+   },
+   {
+    "at_mask": 2015,
+    "missing_bits": [
+     0,
+     2,
+     3,
+     6,
+     7,
+     8,
+     9
+    ]
+   }
+  ]
+ },
+ "mutagenicity_gxai_seed46": {
+  "dataset": "mutagenicity_gxai",
+  "seed": 46,
+  "mask": 1775,
+  "k": 9,
+  "v_full": 0.9358490566037736,
+  "binomial_se": 0.015051559169232526,
+  "trace": [
+   [
+    8,
+    0.9245283018867925
+   ],
+   [
+    4,
+    0.9245283018867925
+   ]
+  ],
+  "terminated": "stopped_by_rule",
+  "n_cached_masks": 127,
+  "n_leave_one_out_of_full_cached": 9,
+  "missing_candidates_along_path": [
+   {
+    "at_mask": 2047,
+    "missing_bits": [
+     6,
+     7
+    ]
+   },
+   {
+    "at_mask": 1791,
+    "missing_bits": [
+     0,
+     1,
+     2,
+     3,
+     5,
+     6,
+     9,
+     10
+    ]
+   },
+   {
+    "at_mask": 1775,
+    "missing_bits": [
+     0,
+     2,
+     3,
+     5,
+     6,
+     7,
+     9,
+     10
+    ]
+   }
+  ]
+ },
+ "NCI1_seed45": {
+  "dataset": "NCI1",
+  "seed": 45,
+  "mask": 1791,
+  "k": 10,
+  "v_full": 0.7049659201557936,
+  "binomial_se": 0.014230984051829869,
+  "trace": [
+   [
+    8,
+    0.7030185004868549
+   ]
+  ],
+  "terminated": "stopped_by_rule",
+  "n_cached_masks": 129,
+  "n_leave_one_out_of_full_cached": 10,
+  "missing_candidates_along_path": [
+   {
+    "at_mask": 2047,
+    "missing_bits": [
+     4
+    ]
+   },
+   {
+    "at_mask": 1791,
+    "missing_bits": [
+     0,
+     1,
+     2,
+     4,
+     7,
+     9,
+     10
+    ]
+   }
+  ]
+ },
+ "NCI1_seed46": {
+  "dataset": "NCI1",
+  "seed": 46,
+  "mask": 1983,
+  "k": 10,
+  "v_full": 0.6786757546251218,
+  "binomial_se": 0.014571950711073065,
+  "trace": [
+   [
+    6,
+    0.688412852969815
+   ]
+  ],
+  "terminated": "stopped_by_rule",
+  "n_cached_masks": 131,
+  "n_leave_one_out_of_full_cached": 6,
+  "missing_candidates_along_path": [
+   {
+    "at_mask": 2047,
+    "missing_bits": [
+     3,
+     5,
+     8,
+     9,
+     10
+    ]
+   },
+   {
+    "at_mask": 1983,
+    "missing_bits": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     8,
+     10
+    ]
+   }
+  ]
+ },
+ "cocitation_cora_seed45": {
+  "dataset": "cocitation_cora",
+  "seed": 45,
+  "mask": 1519,
+  "k": 9,
+  "v_full": 0.6144756277695717,
+  "binomial_se": 0.01870612861155001,
+  "trace": [
+   [
+    4,
+    0.620384047267356
+   ],
+   [
+    9,
+    0.6189069423929099
+   ]
+  ],
+  "terminated": "stopped_by_rule",
+  "n_cached_masks": 130,
+  "n_leave_one_out_of_full_cached": 8,
+  "missing_candidates_along_path": [
+   {
+    "at_mask": 2047,
+    "missing_bits": [
+     0,
+     3,
+     10
+    ]
+   },
+   {
+    "at_mask": 2031,
+    "missing_bits": [
+     0,
+     1,
+     2,
+     3,
+     5,
+     6,
+     8,
+     10
+    ]
+   },
+   {
+    "at_mask": 1519,
+    "missing_bits": [
+     0,
+     1,
+     2,
+     3,
+     6,
+     7,
+     8,
+     10
+    ]
+   }
+  ]
+ },
+ "cocitation_cora_seed46": {
+  "dataset": "cocitation_cora",
+  "seed": 46,
+  "mask": 1663,
+  "k": 9,
+  "v_full": 0.568685376661743,
+  "binomial_se": 0.019034382287293688,
+  "trace": [
+   [
+    8,
+    0.5642540620384048
+   ],
+   [
+    7,
+    0.552437223042836
+   ]
+  ],
+  "terminated": "stopped_by_rule",
+  "n_cached_masks": 124,
+  "n_leave_one_out_of_full_cached": 8,
+  "missing_candidates_along_path": [
+   {
+    "at_mask": 2047,
+    "missing_bits": [
+     4,
+     9,
+     10
+    ]
+   },
+   {
+    "at_mask": 1791,
+    "missing_bits": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     9,
+     10
+    ]
+   },
+   {
+    "at_mask": 1663,
+    "missing_bits": [
+     0,
+     3,
+     4,
+     5,
+     6,
+     9,
+     10
+    ]
+   }
+  ]
+ },
+ "cocitation_citeseer_seed45": {
+  "dataset": "cocitation_citeseer",
+  "seed": 45,
+  "mask": 103,
+  "k": 5,
+  "v_full": 0.5415162454873647,
+  "binomial_se": 0.01728491344161941,
+  "trace": [
+   [
+    10,
+    0.5523465703971119
+   ],
+   [
+    3,
+    0.5583634175691937
+   ],
+   [
+    8,
+    0.5583634175691937
+   ],
+   [
+    7,
+    0.5583634175691937
+   ],
+   [
+    9,
+    0.5583634175691937
+   ],
+   [
+    4,
+    0.555956678700361
+   ]
+  ],
+  "terminated": "stopped_by_rule",
+  "n_cached_masks": 129,
+  "n_leave_one_out_of_full_cached": 8,
+  "missing_candidates_along_path": [
+   {
+    "at_mask": 2047,
+    "missing_bits": [
+     0,
+     1,
+     4
+    ]
+   },
+   {
+    "at_mask": 1023,
+    "missing_bits": [
+     0,
+     1,
+     2,
+     4,
+     5,
+     6,
+     8,
+     9
+    ]
+   },
+   {
+    "at_mask": 1015,
+    "missing_bits": [
+     0,
+     1,
+     2,
+     5,
+     6,
+     7,
+     9
+    ]
+   },
+   {
+    "at_mask": 759,
+    "missing_bits": [
+     0,
+     1,
+     2,
+     5,
+     6,
+     9
+    ]
+   },
+   {
+    "at_mask": 631,
+    "missing_bits": [
+     0,
+     1,
+     2,
+     4,
+     5,
+     6
+    ]
+   },
+   {
+    "at_mask": 119,
+    "missing_bits": [
+     0,
+     1,
+     5,
+     6
+    ]
+   },
+   {
+    "at_mask": 103,
+    "missing_bits": [
+     0,
+     1,
+     5,
+     6
+    ]
+   }
+  ]
+ },
+ "cocitation_citeseer_seed46": {
+  "dataset": "cocitation_citeseer",
+  "seed": 46,
+  "mask": 767,
+  "k": 9,
+  "v_full": 0.5992779783393501,
+  "binomial_se": 0.016999464952890092,
+  "trace": [
+   [
+    10,
+    0.6137184115523465
+   ],
+   [
+    8,
+    0.6137184115523465
+   ]
+  ],
+  "terminated": "stopped_by_rule",
+  "n_cached_masks": 131,
+  "n_leave_one_out_of_full_cached": 9,
+  "missing_candidates_along_path": [
+   {
+    "at_mask": 2047,
+    "missing_bits": [
+     3,
+     4
+    ]
+   },
+   {
+    "at_mask": 1023,
+    "missing_bits": [
+     0,
+     1,
+     4,
+     5,
+     6,
+     7,
+     9
+    ]
+   },
+   {
+    "at_mask": 767,
+    "missing_bits": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     9
+    ]
+   }
+  ]
+ },
+ "cocitation_pubmed_seed45": {
+  "dataset": "cocitation_pubmed",
+  "seed": 45,
+  "mask": 1279,
+  "k": 9,
+  "v_full": 0.6985189693649827,
+  "binomial_se": 0.006536416066730783,
+  "trace": [
+   [
+    9,
+    0.7013593020896733
+   ],
+   [
+    8,
+    0.6970988030026375
+   ]
+  ],
+  "terminated": "stopped_by_rule",
+  "n_cached_masks": 126,
+  "n_leave_one_out_of_full_cached": 10,
+  "missing_candidates_along_path": [
+   {
+    "at_mask": 2047,
+    "missing_bits": [
+     6
+    ]
+   },
+   {
+    "at_mask": 1535,
+    "missing_bits": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     10
+    ]
+   },
+   {
+    "at_mask": 1279,
+    "missing_bits": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     10
+    ]
+   }
+  ]
+ },
+ "cocitation_pubmed_seed46": {
+  "dataset": "cocitation_pubmed",
+  "seed": 46,
+  "mask": 1007,
+  "k": 9,
+  "v_full": 0.6244674376141205,
+  "binomial_se": 0.006897620398988944,
+  "trace": [
+   [
+    10,
+    0.6565226212213431
+   ],
+   [
+    4,
+    0.6662609048488537
+   ]
+  ],
+  "terminated": "stopped_by_rule",
+  "n_cached_masks": 131,
+  "n_leave_one_out_of_full_cached": 8,
+  "missing_candidates_along_path": [
+   {
+    "at_mask": 2047,
+    "missing_bits": [
+     0,
+     2,
+     9
+    ]
+   },
+   {
+    "at_mask": 1023,
+    "missing_bits": [
+     0,
+     1,
+     2,
+     3,
+     6,
+     7,
+     8
+    ]
+   },
+   {
+    "at_mask": 1007,
+    "missing_bits": [
+     1,
+     2,
+     5,
+     7,
+     8,
+     9
+    ]
+   }
+  ]
+ }
+}

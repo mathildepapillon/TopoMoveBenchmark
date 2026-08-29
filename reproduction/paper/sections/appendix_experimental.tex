@@ -1,0 +1,262 @@
+% ======================================================================
+% Appendix -- Experimental details
+% Binding style rules apply here too: multi-seed error bars,
+% parameter/budget matching on all comparisons, "neighborhoods".
+% ======================================================================
+\section{Experimental Details}
+\label{app:experimental}
+
+\subsection{Datasets and Liftings}
+% TODO(researcher): dataset statistics table (graphs, cells per rank
+% after lifting, class balance) for Benzene, Fluoride-Carbonyl,
+% Mutagenicity, MANTRA, MUTAG, NCI1, citation graphs.
+\todoresearcher{Fill dataset statistics and lifting configuration
+(TopoBench lifting names + parameters).}
+
+\subsection{Dataset Coverage and Scope}
+\label{app:coverage}
+
+\textbf{Coverage.} The selection experiments cover
+\unfrozen{\ResLeadPanels} datasets: the
+\unfrozen{\ResMarkerDatasets}-dataset development suite (Benzene,
+Fluoride-Carbonyl, Mutagenicity, NCI1, Cora, Citeseer, Pubmed) plus
+four datasets added at campaign time (MUTAG, NCI109, Alkane-Carbonyl,
+MANTRA orientability), every arm under the one pipeline of
+\cref{app:pipeline-protocol} at the shared seeds
+\unfrozen{\ResSeedList} with measured FLOPs. Every row of
+\cref{tab:performance-summary} carries a $B{=}1$ arm; runs that
+predate the profiler are priced post hoc from their recorded
+architectures (\cref{app:flops-conventions}). Where an
+exhaustively-enumerated exact landscape exists (MUTAG, NCI109,
+Alkane-Carbonyl; \cref{app:selection-evidence}) its optimum stands in
+for the GCCN sweep, marked $^{e}$ in the table.
+
+\textbf{Out of scope, declared.} No selection arm ran on PROTEINS;
+it appears in the faithfulness study only (\cref{tab:nogt}). The
+HOPSE family is evaluated on complex-level tasks; the node-level
+citation complexes carry the GCCN family only. HOPSE's clinical quartet (BBB-Martins, Caco2-Wang,
+CYP3A4-Veith, Clearance-Hepatocyte-AZ) is likewise out of scope: none
+of our arms ran there, and we report no borrowed numbers. ZINC is
+\emph{deferred}, not skipped: the stop rule derives from a
+classification validation set's binomial noise floor, ZINC is a
+regression task, and its arm waits on a pre-registered regression
+noise floor rather than an analogue improvised after seeing results
+(its exact landscape already serves in the out-of-sample scoring of
+\cref{app:selection-evidence}).
+
+\textbf{The MANTRA metric.} MANTRA orientability is class-imbalanced:
+the majority class is \unfrozen{\ResMantraMajorityRate} of every
+split (per-seed class-balance record frozen with the results). An
+executable sanity check comparing each cell's plain accuracy against
+that rate flagged \unfrozen{\ResMantraCollapsedModels} frozen cells
+as byte-identical majority collapses, so every MANTRA number in the
+paper is balanced test accuracy (mean per-class recall), re-scored
+from each arm's saved best checkpoint. Selection inside every arm
+still uses plain validation accuracy exactly as wired---the balanced
+metric never re-selects---so the re-scoring changes no pick, only the
+reported score.
+
+\subsection{Models and Training}
+\label{app:models-training}
+
+\textbf{Model configuration (architecture selection, GCCN family).} All architecture-%
+selection experiments use the \texttt{topotune\_nonlinear\_exact}
+configuration: the TopoTune GCCN backbone with a linear sum-pool readout
+(\texttt{NoReadOut}). \textbf{Protocol-fidelity calibration}: at the
+Benzene calibration architecture (mask \unfrozen{\ResCalibMaskID}), the
+backbone parameter count reproduces the recorded experimental protocol
+exactly---\unfrozen{\ResCalibBackboneParams} backbone parameters---which
+is how we verify that reimplemented runs train the same model as the
+original record, down to the readout choice.
+
+\textbf{Seeds.} Every comparison uses the identical seed set
+\unfrozen{\ResSeedList} for our pipeline and for every baseline; on
+the seven development-suite datasets our own arms additionally carry
+$n=$ \unfrozen{\ResOurReplications} seeds in the frozen record.
+Selection within every method is per-seed
+validation-best; no method sees test data before final scoring.
+% TODO(researcher): optimizer, LR schedule, epochs, early stopping,
+% hardware, wall-clock per run.
+\todoresearcher{Fill remaining training configuration; must match the
+budget-matching protocol referenced in \cref{sec:predictions}.}
+
+\subsection{Protocol Uniformity Across Methods}
+\label{app:protocol-uniformity}
+
+One selection pipeline is applied identically across every dataset and
+every model family; the table below is generated directly from the run
+manifests so that uniformity is checkable rather than asserted.
+% TODO(generated): scripts/make_tables.py will emit
+% tables/protocol_uniformity.tex from data/frozen/; the current file is
+% a placeholder stub.
+\input{tables/protocol_uniformity}
+
+\subsection{FLOPs Measurement Conventions}
+\label{app:flops-conventions}
+
+All FLOPs in this paper are measured under one convention, identical
+across our pipeline and every baseline:
+\begin{itemize}
+  \item PyTorch \texttt{FlopCounterMode} with dense pricing;
+  \item explicit shims for operations the counter does not price
+    natively: eigendecomposition (\texttt{eigh}), SVD, and sparse
+    operations;
+  \item every stage of every method is charged, including HOPSE's
+    encoding preprocessing. That preprocessing is FLOPs-cheap but
+    wall-clock-heavy, so the FLOPs axis of \cref{fig:lead} is the
+    choice \emph{generous to the baselines}; the wall-clock variant of
+    the figure is in \cref{app:figures}.
+\end{itemize}
+Cost claims in training-run equivalents are priced on unique coalition
+evaluations (\cref{app:accounting}); the per-dataset,
+per-stage ledger is generated from the frozen measurements.
+
+Selection runs that predate the profiler are priced post hoc: we
+rebuild the recorded architectures, profile one training epoch and the
+evaluation passes under the convention above, and combine the counts
+with the recorded epoch and evaluation tallies. FLOP counts depend
+only on architecture and data, so these costs are measured, not
+estimated.
+% TODO(researcher): frozen cost-ledger table pointer once generated.
+
+\subsection{The Canonical Pipeline: Exact Protocol}
+\label{app:pipeline-protocol}
+
+Brief run: the all-components model
+(\unfrozen{\ResNumNeighborhoods} neighborhoods in the GCCN family; all
+encoding blocks in HOPSE), trained \unfrozen{\ResStemEpochs} epochs.
+Cheap game: masked validation accuracy with removal semantics matching
+deployment-time pruning (\cref{sec:framework-game2}); attribution
+budget \unfrozen{\ResSampledPasses} passes
+($\sim$\unfrozen{\ResUniqueEvals} unique coalition evaluations after
+caching). Elimination: backward from the full coalition,
+removing the cheapest component while removal cost is below the
+1-standard-error binomial floor $\sqrt{p(1-p)/m}$ of the validation
+set. Candidates: candidate 1 = the stop candidate; candidates $2..B$
+= highest-cheap-value coalitions at sizes not yet taken (rule frozen
+before any $B \ge 2$ experiment ran). Continuation: train each
+selected candidate to the standard budget; select by validation
+accuracy.
+% TODO(researcher): exact epoch counts, sampling seeds, and the
+% measured ledger backing the \ResLadderCostBOne / \ResLadderCostBTwo
+% training-run-equivalent claims.
+
+\subsection{Development Trajectory (Disclosure)}
+\label{app:dev-trajectory}
+
+For evaluation hygiene we disclose the selection heuristics explored
+before the rule was frozen. During development on the
+\unfrozen{\ResMarkerDatasets}-dataset suite we iterated on (i)
+\emph{anchored selection}, which always keeps the
+\nbhd{up\_adjacency-0} neighborhood---effective on the molecule
+datasets but contradicted on Fluoride-Carbonyl, where anchor-free
+architectures win without any catastrophe, so the anchor is a
+suite-specific prior rather than a rule; and (ii) a
+\emph{certify-or-repair} fallback wrapper, which retrains a second
+candidate when the first falls below an in-run reference. Both were
+retired as fitted to the development suite. The frozen procedure
+subsumes their useful behavior structurally: backward elimination
+keeps last-copy components without being told which ones are anchors,
+and budget $B=2$ provides the fallback as an explicit, pre-priced
+candidate rather than a triggered repair. All numbers from the development suite
+are labeled exploratory wherever they appear; the pre-registered
+battery is the confirmatory layer (\cref{app:selection-evidence}).
+
+\subsection{Baseline Explainers and Budget Matching (Prediction Explanations)}
+% TODO(researcher): SubgraphX rollout budget, GNNExplainer /
+% PGExplainer epochs and hyperparameters, and the shared evaluation
+% budget that makes comparisons parameter/budget matched.
+\todoresearcher{Fill prediction-explanation baseline budgets.}
+
+\subsection{Trustworthiness Details}
+\label{app:trust-details}
+
+\textbf{What the axiom checks caught} (each independently confirmed and
+reported upstream):
+\begin{itemize}
+  \item \textbf{Dead inter-rank routes}: swapped \texttt{edge\_index}
+    rows silently zeroed messages along certain inter-rank
+    neighborhoods; flagged by null-player checks assigning exact zeros
+    to neighborhoods that should have mattered.
+    % TODO(researcher): upstream issue/PR numbers.
+  \item \textbf{Batch-dependent collapsed backbone}: a backbone
+    configuration collapsed to batch-size-dependent behavior; flagged
+    by attribution non-invariance across batch compositions.
+  \item \textbf{Rank-aliasing offsets}: cell-index offsets aliased
+    features across ranks; flagged by symmetry violations between
+    provably symmetric cells.
+  \item \textbf{Composed cross-rank batching bug}: individually correct
+    components composed into incorrect cross-rank batching; caught by
+    the invariance guard that re-runs attributions under permuted
+    batching and requires bitwise-stable results.
+\end{itemize}
+% TODO(researcher): frozen check-suite runtime numbers + pointer to the
+% released test suite.
+
+\textbf{Second-family replication of substitute-commitment.} On
+Mutagenicity (seed 43) the briefly trained HOPSE model commits to a
+different trio of
+encoding blocks than its sibling seeds; the committed pick lands
+\unfrozen{\ResHopseCommitDropPts} accuracy points below them, and
+validation already shows it (\unfrozen{\ResHopseCommitValBad} vs.\
+\unfrozen{\ResHopseCommitValSibA} and
+\unfrozen{\ResHopseCommitValSibB}). The mechanism is a property of
+briefly trained models under redundancy, not of message passing in
+particular.
+
+\textbf{Catastrophe audit (validation visibility).} Across the
+\unfrozen{\ResCatastropheCells} development-grid runs, exactly
+\unfrozen{\ResCatastropheCount} selections were catastrophic (test
+accuracy far below their replicate median); both were equally visible
+in validation (\unfrozen{\ResCatastropheValA} and
+\unfrozen{\ResCatastropheValB} against
+$\sim$\unfrozen{\ResCatastropheSiblingVal} for siblings), with
+\unfrozen{\ResCatastropheFalseAlarms} false alarms at the same
+threshold---which is why the pipeline's final decision is always a
+validation comparison of trained candidates.
+
+\textbf{The plateau as an executable check.} On
+\unfrozen{\ResStemEpochs}-epoch briefly trained models the cheap
+game's gain
+\emph{magnitudes} saturate---in the cross-cluster replication,
+\unfrozen{\ResPlateauZeroCells}/\unfrozen{\ResPlateauTotalCells} runs
+had exactly-zero best gains at small coalitions---while the
+\emph{ordering} survives. Exact zeros in gain magnitudes are an
+executable signature, not a judgment call, which is how the
+forward-greedy null (\cref{app:selection-backward}) was diagnosed
+rather than merely observed; the design consequence is that every
+threshold decision consumes trained-candidate validation or the
+binomial floor, never a raw cheap-game gain.
+
+\subsection{Auditable Cost Accounting: Unique Coalition Evaluations}
+\label{app:accounting}
+
+The ``\unfrozen{\ResSampledPasses}-pass'' attribution budget counts
+\emph{unique} coalition evaluations:
+$\sim$\unfrozen{\ResUniqueEvals} cached evaluations, or
+$\approx$\unfrozen{\ResUniqueEvalFraction}$\times$ the exact game's
+\unfrozen{\ResExactGameCoalitions} coalitions. Permutation sampling
+revisits coalitions; with caching, the number of forward passes
+actually paid is the unique-evaluation count, not the nominal pass
+count---the two can differ by an order of magnitude---and the measured
+wall clocks confirm the accounting, so every cost claim in
+\cref{sec:performance} is priced on the paid number.
+
+\subsection{Reproducibility}
+\label{app:reproducibility}
+
+Every number in this paper is a macro regenerated from a frozen,
+checksummed results directory; no result is typed by hand. One command
+(\texttt{scripts/reproduce.sh}) reruns the test suite, regenerates all
+tables, macros, and figures, and verifies presentation numbers against
+the same frozen files. The freeze manifest hash for this draft is
+\texttt{\ResManifestHash}; any post-freeze drift in the underlying data
+fails the build.
+
+\subsection{Axiom Check Suite}
+% TODO(researcher): list each executable check (efficiency, null
+% player, symmetry, batching/ordering invariance guard), its tolerance,
+% and the reproduction commands for the
+% \ResNumBugsTotal caught bugs (upstream issue links).
+\todoresearcher{Document the executable-check suite and bug
+reproductions.}

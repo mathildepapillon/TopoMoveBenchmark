@@ -1,0 +1,83 @@
+{
+ "dataset": "mantra_orientation",
+ "task": "orientation",
+ "note": "per-seed per-split class counts; majority_rate = max class share (the collapsed-classifier reference line)",
+ "seed42": {
+  "train": {
+   "counts": {
+    "0": 19858,
+    "1": 1710
+   },
+   "n": 21568,
+   "majority_rate": 0.9207158753709199
+  },
+  "val": {
+   "counts": {
+    "0": 9930,
+    "1": 855
+   },
+   "n": 10785,
+   "majority_rate": 0.9207232267037552
+  },
+  "test": {
+   "counts": {
+    "0": 9930,
+    "1": 855
+   },
+   "n": 10785,
+   "majority_rate": 0.9207232267037552
+  }
+ },
+ "seed43": {
+  "train": {
+   "counts": {
+    "0": 19858,
+    "1": 1710
+   },
+   "n": 21568,
+   "majority_rate": 0.9207158753709199
+  },
+  "val": {
+   "counts": {
+    "0": 9930,
+    "1": 855
+   },
+   "n": 10785,
+   "majority_rate": 0.9207232267037552
+  },
+  "test": {
+   "counts": {
+    "0": 9930,
+    "1": 855
+   },
+   "n": 10785,
+   "majority_rate": 0.9207232267037552
+  }
+ },
+ "seed44": {
+  "train": {
+   "counts": {
+    "0": 19858,
+    "1": 1710
+   },
+   "n": 21568,
+   "majority_rate": 0.9207158753709199
+  },
+  "val": {
+   "counts": {
+    "0": 9930,
+    "1": 855
+   },
+   "n": 10785,
+   "majority_rate": 0.9207232267037552
+  },
+  "test": {
+   "counts": {
+    "0": 9930,
+    "1": 855
+   },
+   "n": 10785,
+   "majority_rate": 0.9207232267037552
+  }
+ }
+}

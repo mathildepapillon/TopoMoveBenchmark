@@ -1,0 +1,5 @@
+{
+ "dataset": "NCI109",
+ "tag": "cfg08_mask255",
+ "preprocessing_seconds": 727.220947265625
+}

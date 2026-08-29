@@ -1,0 +1,45 @@
+AvgTime/train_batch_mean: !!python/object/apply:numpy.core.multiarray.scalar
+- &id001 !!python/object/apply:numpy.dtype
+  args:
+  - f8
+  - false
+  - true
+  state: !!python/tuple
+  - 3
+  - <
+  - null
+  - null
+  - null
+  - -1
+  - -1
+  - 0
+- !!binary |
+  qrOlOtSboT8=
+AvgTime/train_batch_std: !!python/object/apply:numpy.core.multiarray.scalar
+- *id001
+- !!binary |
+  qmMjB82DXT8=
+AvgTime/train_epoch_mean: !!python/object/apply:numpy.core.multiarray.scalar
+- *id001
+- !!binary |
+  AAAAFXBpJ0A=
+AvgTime/train_epoch_std: !!python/object/apply:numpy.core.multiarray.scalar
+- *id001
+- !!binary |
+  Cc7ycRL+zz8=
+AvgTime/val_batch_mean: !!python/object/apply:numpy.core.multiarray.scalar
+- *id001
+- !!binary |
+  m/jnMQoynT8=
+AvgTime/val_batch_std: !!python/object/apply:numpy.core.multiarray.scalar
+- *id001
+- !!binary |
+  tfbr5ubwZj8=
+AvgTime/val_epoch_mean: !!python/object/apply:numpy.core.multiarray.scalar
+- *id001
+- !!binary |
+  AAAA7NzLDUA=
+AvgTime/val_epoch_std: !!python/object/apply:numpy.core.multiarray.scalar
+- *id001
+- !!binary |
+  VrGtEq3V0z8=

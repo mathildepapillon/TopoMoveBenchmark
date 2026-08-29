@@ -1,0 +1,41 @@
+{
+ "dataset": "fluoride_carbonyl",
+ "counter": "torch.utils.flop_counter.FlopCounterMode; dense matmul/conv ops, sparse scatter propagation uncounted (identical accounting across arms); backward profiled through a scalar sum of logits",
+ "per_mask": {
+  "4": {
+   "k": 1,
+   "train_epoch_flops": 4886338432,
+   "eval_pass_flops": 524277760,
+   "profile_seconds": 8.53
+  },
+  "1775": {
+   "k": 9,
+   "train_epoch_flops": 30999106432,
+   "eval_pass_flops": 2706913280,
+   "profile_seconds": 12.5
+  },
+  "2031": {
+   "k": 10,
+   "train_epoch_flops": 31229924224,
+   "eval_pass_flops": 2731898880,
+   "profile_seconds": 12.84
+  },
+  "2047": {
+   "k": 11,
+   "train_epoch_flops": 33718850432,
+   "eval_pass_flops": 2999080960,
+   "profile_seconds": 13.49
+  }
+ },
+ "source": "local ladder_b2 backfill (rung1/rung2 masks, seeds 42-44, plus 2047); model cell/topotune_nonlinear_exact, full 11-vocabulary bit order",
+ "stem_epochs": 5,
+ "prune_epoch": 5,
+ "seeds": [
+  42,
+  43,
+  44
+ ],
+ "torch_version": "2.3.0+cu121",
+ "device": "cuda",
+ "gpu": "NVIDIA H200"
+}

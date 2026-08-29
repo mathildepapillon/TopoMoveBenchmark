@@ -1,0 +1,113 @@
+% ======================================================================
+% Section 1 -- Introduction (~1.25 pp incl. Fig 1)
+% Binding: "what explainability buys practitioners"; "neighborhoods",
+% never "relations"; no em dashes; short sentences; molecule gloss
+% appears once, TopoTune parenthetical style.
+% ======================================================================
+\section{Introduction}
+\label{sec:introduction}
+
+Graph neural networks (GNNs) learn from pairwise connections. Many
+systems carry structure beyond pairs: a benzene ring is a six-atom
+object whose meaning is lost when read bond by bond. Topological deep
+learning (TDL) models this higher-order structure directly
+\citep{hajij2023tdl,papamarkou2024position}. Its domains are
+\emph{combinatorial complexes}, which store multi-way interactions as
+first-class objects called \emph{cells}, organized by \emph{rank}: in a
+molecule, atoms (nodes, i.e., cells of rank zero), bonds (edges, i.e.,
+cells of rank one), and rings (cells of rank two). Topological neural
+networks (TNNs) exchange messages between cells along
+\emph{neighborhoods} \citep{bodnar2021cwn,papillon2025topotune,
+hopse2025}, and now match or exceed GNNs on molecular and geometric
+benchmarks \citep{telyatnikov2024topobench}.
+
+These models cannot yet be explained in their own vocabulary. Post-hoc
+explainers for GNNs \citep{ying2019gnnexplainer,luo2020parameterized,
+yuan2021subgraphx,muschalik2024graphshapiq} operate on nodes and
+edges. A ring is not expressible in their output space, so the
+structures a TNN reasons with cannot appear in its explanation. A
+practitioner deploying a TNN today cannot answer two basic questions:
+which cells drove this prediction, and which neighborhoods drive this
+model's performance.
+
+We introduce \method, which answers both questions with one cooperative
+game (\cref{fig:overview}). The players are the cells of the input
+complex. The value of a coalition is the model's output when only those
+cells participate: features, neighborhood matrices, and readout pooling
+are all restricted to the coalition. From this game \method returns two
+outputs. The \emph{attribution} assigns each cell a Shapley value
+\citep{shapley1953value}, inheriting the classical axioms. The
+\emph{explanation} is the smallest sub-complex sufficient to preserve
+the prediction, found by greedy pruning.
+
+The game makes no assumption about rank. On graphs, which are rank-1
+complexes, it reduces to induced-subgraph removal, and the explanation
+output solves the same search problem as SubgraphX
+\citep{yuan2021subgraphx}. This reduction lets us validate \method on
+the community's own benchmarks before using its generality: on GraphXAI
+\citep{agarwal2023graphxai}, \method matches or outperforms GNN
+explainers on identical subjects, splits, and metrics
+(\cref{tab:graph-benchmarks}), at up to 500 times lower cost than
+search-based methods. The same implementation then runs unchanged on
+higher-order models, where the baselines are undefined. It recovers
+motifs on lifted molecular benchmarks (\cref{tab:lifted}), is the most
+faithful method on TopoBench datasets that carry no explanation ground
+truth (\cref{tab:nogt}), and separates how models decide on native
+triangulations (\cref{sec:predictions}).
+
+The same game template also explains performance
+(\cref{sec:performance}). With neighborhoods as players and validation
+accuracy as the value, one short training run prices every
+message-passing route. The resulting selection recipe costs roughly one
+tenth of an architecture sweep and concedes at most two accuracy
+points to it.
+
+Explaining these models also taught us something about their inputs.
+Standard feature liftings compute higher-rank features by aggregating
+lower-rank ones, which caches structural facts into feature vectors.
+Models trained on such caches read them instead of computing structure,
+and their explanations degrade measurably. A structure-only lifting
+removes the cache and improves accuracy and explanation quality
+together (\cref{sec:predictions}). This is a design rule practitioners
+can apply directly.
+
+\textbf{Contributions.}
+\begin{itemize}
+  \item \textbf{Method.} The participation game on combinatorial
+    complexes, with two outputs: per-cell Shapley attributions and the
+    smallest sufficient sub-complex (\cref{sec:framework}).
+  \item \textbf{Reduction.} At rank 1 the game recovers the search
+    problem of SubgraphX; the remaining design choices are ablated
+    empirically (\cref{sec:predictions}).
+  \item \textbf{Evidence.} Fair, same-subject comparisons on GraphXAI;
+    motif recovery, ground-truth-free faithfulness, and model
+    diagnostics on higher-order domains; all with multi-seed error
+    bars (\cref{sec:predictions}).
+  \item \textbf{Architecture selection.} The performance
+    instantiation and its selection recipe, priced honestly
+    (\cref{sec:performance}).
+  \item \textbf{The lifting finding.} Feature caches reduce
+    explainability; a structure-only lifting improves accuracy and
+    explanations together (\cref{sec:predictions}).
+  \item \textbf{Open source.} One reproducible pipeline covering every
+    number and figure in the paper.
+\end{itemize}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{../figures/out/overview.pdf}
+  \caption{\textbf{\method: one game, two instantiations.}
+  \textbf{A.}~Players are the cells of the input complex
+  $\mathcal{C}$. A coalition $S$ keeps a subset of cells;
+  $v(S)$ is the model output on the induced sub-complex
+  $\mathcal{C}[S]$. Averaging marginal contributions over coalitions
+  yields one Shapley value $\phi_\sigma$ per cell (output 1). Greedy
+  pruning yields the smallest sufficient sub-complex $S^{*}_{b}$
+  (output 2). \textbf{B.}~Players are the neighborhoods
+  $\mathcal{N}$ of the architecture, drawn as source rank
+  $\rightarrow$ destination rank, and $v(S)$ is the validation
+  accuracy of a briefly trained model using only the neighborhoods in
+  $S$; the same averaging attributes performance per neighborhood
+  ($\phi_{\mathcal{N}}$).}
+  \label{fig:overview}
+\end{figure}

@@ -1,0 +1,13 @@
+status: COMPLETE
+generated: 2026-08-18T19:40:49+00:00
+parquets:
+  data/frozen/anchored3_exact_mantra.parquet rows=3/3
+  data/frozen/ladder_b2_mantra.parquet rows=3/3
+  data/frozen/ladder_b2_hopse_mantra.parquet rows=3/3
+  data/frozen/hopse_sweep_mantra.parquet rows=36/36
+  data/frozen/gccn_menu_mantra.parquet rows=18/18
+  data/frozen/hopse_k3_rung.parquet rows=21/21
+class balance record: results/mantra_prepare_logs/class_balance.json present
+balanced-eval backfill check: complete
+missing cells:
+  none

@@ -1,0 +1,83 @@
+% ======================================================================
+% Appendix -- Notation and glossary
+% Accessibility requirement (researcher-set): every recurring term and
+% symbol, its plain-English meaning, and where it is first used.
+% ======================================================================
+\section{Notation and Glossary}
+\label{app:glossary}
+
+\Cref{tab:glossary} collects the paper's recurring terms and symbols.
+Each entry gives the plain-English meaning used throughout, anchored in
+the molecule running example (atoms $=$ nodes $=$ rank 0, bonds $=$
+edges $=$ rank 1, rings $=$ faces $=$ rank 2), and the section where
+the term is first defined.
+
+\begin{table}[h]
+\centering
+\caption{Glossary of terms and symbols.}
+\label{tab:glossary}
+\small
+\begin{tabular}{p{0.20\linewidth}p{0.56\linewidth}l}
+\toprule
+Term / symbol & Plain meaning & First use \\
+\midrule
+cell & A node or a group of nodes stored as one object: an atom, a
+  bond, a ring. & \cref{sec:prelim-cc} \\
+rank, $\rk$ & Which level a cell lives on: atoms 0, bonds 1, rings 2.
+  & \cref{sec:prelim-cc} \\
+combinatorial complex, $\mathcal{C}$ & The data structure holding all
+  cells of all ranks for one input. & \cref{sec:prelim-cc} \\
+lifting & Converting a plain graph into a complex, \eg promoting a
+  molecule's chordless cycles to ring cells. & \cref{sec:prelim-cc} \\
+neighborhood, $N$ & A message-passing route: who talks to whom (\eg
+  atom$\to$bond, bond$\to$ring). & \cref{sec:prelim-gccn} \\
+GCCN & Generalized combinatorial complex network: a TDL model built
+  from one submodule per neighborhood. & \cref{sec:prelim-gccn} \\
+neighborhood-indexed component & The architecture piece a model has
+  one of per neighborhood: a GCCN route, a HOPSE encoding block.
+  & \cref{sec:framework-game2} \\
+game, $v$ & An assignment of a score to every subset of players.
+  & \cref{sec:prelim-shapley} \\
+coalition, $S$ & A subset of players (cells, or components).
+  & \cref{sec:prelim-shapley} \\
+marginal contribution & How much the score changes when one player
+  joins a coalition. & \cref{sec:prelim-shapley} \\
+Shapley value, $\phi_i$ & A player's average marginal contribution over
+  all coalitions; the unique fair credit split.
+  & \cref{sec:prelim-shapley} \\
+masking & Neutralizing the players outside a coalition so the model
+  behaves as if they were absent. & \cref{sec:framework-game1} \\
+exact (retraining) game & Score of a coalition $=$ validation accuracy
+  after training from scratch with exactly those components.
+  & \cref{sec:framework-game2} \\
+cheap (masked-validation) game, $v_{\mathrm{prune}}$ & Score of a
+  coalition $=$ the brief run's validation accuracy with the other
+  components removed; one forward pass per coalition.
+  & \cref{sec:framework-game2} \\
+brief run & The all-components model trained briefly
+  (\unfrozen{\ResStemEpochs} epochs) before attribution.
+  & \cref{sec:framework-game2} \\
+candidate sequence & The nested sequence of shrinking architectures
+  produced by backward elimination; one candidate per size.
+  & \cref{sec:method-pipeline} \\
+candidate & One architecture in the candidate sequence.
+  & \cref{sec:method-pipeline} \\
+stop candidate & The smallest candidate whose next removal would cost
+  more than the noise floor. & \cref{app:selection-ladder} \\
+budget $B$ & How many candidates are trained to completion before
+  validation picks; the practitioner's dial.
+  & \cref{sec:method-pipeline} \\
+binomial floor & The validation set's own noise level,
+  $\sqrt{p(1-p)/m}$; the elimination's stop threshold.
+  & \cref{sec:method-pipeline} \\
+substitute-commitment & The brief run's arbitrary choice between two
+  components that can do the same job; attribution reports the choice,
+  not the interchangeability. & \cref{app:selection-commitment} \\
+menu & The \unfrozen{\ResMenuEntries} published fixed architectures
+  from the literature, treated as one baseline at its true cost.
+  & \cref{sec:method-pipeline} \\
+sweep & Training one model per candidate configuration and keeping the
+  best; the procedure the pipeline replaces. & \cref{sec:prelim-gccn} \\
+\bottomrule
+\end{tabular}
+\end{table}

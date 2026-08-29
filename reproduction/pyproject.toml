@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "toposhap"
+version = "0.1.0"
+description = "TopoSHAP: cell-native exact Shapley-interaction explanations for topological deep learning models"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+license = { text = "MIT" }
+authors = [{ name = "Anonymous authors" }]
+dependencies = [
+    "numpy",
+    "scipy",
+    "pandas",
+    "pyarrow",
+    "matplotlib",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+# The full stack: pinned TopoBench (editable checkout under external/) plus its
+# heavy dependencies. Core toposhap (games, estimators, selectors, figures, io)
+# deliberately works without torch so analysis runs anywhere.
+# Install the pinned TopoBench separately (its path is machine-local):
+#   git clone https://github.com/geometric-intelligence/TopoBench external/TopoBench
+#   git -C external/TopoBench checkout 6d8953e7e170
+#   uv pip install setuptools wheel && uv pip install -e external/TopoBench --no-build-isolation
+full = [
+    "torch==2.3.0",
+]
+dev = ["pytest", "pytest-cov", "ruff"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"

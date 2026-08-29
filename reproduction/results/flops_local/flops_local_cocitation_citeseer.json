@@ -1,0 +1,59 @@
+{
+ "dataset": "cocitation_citeseer",
+ "counter": "torch.utils.flop_counter.FlopCounterMode; dense matmul/conv ops, sparse scatter propagation uncounted (identical accounting across arms); backward profiled through a scalar sum of logits",
+ "per_mask": {
+  "69": {
+   "k": 3,
+   "train_epoch_flops": 6253964160,
+   "eval_pass_flops": 2296000000,
+   "profile_seconds": 0.24
+  },
+  "1351": {
+   "k": 6,
+   "train_epoch_flops": 7113132544,
+   "eval_pass_flops": 2408427008,
+   "profile_seconds": 0.25
+  },
+  "1359": {
+   "k": 7,
+   "train_epoch_flops": 7187712512,
+   "eval_pass_flops": 2445716992,
+   "profile_seconds": 0.26
+  },
+  "1581": {
+   "k": 6,
+   "train_epoch_flops": 7120316928,
+   "eval_pass_flops": 2398391808,
+   "profile_seconds": 0.25
+  },
+  "1749": {
+   "k": 7,
+   "train_epoch_flops": 7228967424,
+   "eval_pass_flops": 2466344448,
+   "profile_seconds": 0.26
+  },
+  "1773": {
+   "k": 8,
+   "train_epoch_flops": 7290104320,
+   "eval_pass_flops": 2483285504,
+   "profile_seconds": 0.27
+  },
+  "2047": {
+   "k": 11,
+   "train_epoch_flops": 7535028736,
+   "eval_pass_flops": 2605747712,
+   "profile_seconds": 0.29
+  }
+ },
+ "source": "local ladder_b2 backfill (rung1/rung2 masks, seeds 42-44, plus 2047); model cell/topotune_nonlinear_exact, full 11-vocabulary bit order",
+ "stem_epochs": 5,
+ "prune_epoch": 5,
+ "seeds": [
+  42,
+  43,
+  44
+ ],
+ "torch_version": "2.3.0+cu121",
+ "device": "cuda",
+ "gpu": "NVIDIA H200"
+}

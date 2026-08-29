@@ -1,0 +1,138 @@
+{
+ "figure_A_mantra_finding": {
+  "test_auroc_3seed": {
+   "menu": {
+    "mean": 0.5209,
+    "sd": 0.0,
+    "per_seed": [
+     0.5209,
+     0.5209,
+     0.5209
+    ],
+    "source": "data/frozen/gccn_menu_mantra.parquet",
+    "locator": "per-seed argmax val_accuracy over menu entries (selects CWN, mask 26, every seed); column test_auroc"
+   },
+   "gccn": {
+    "mean": 0.7622,
+    "sd": 0.0533,
+    "per_seed": [
+     0.7012,
+     0.7854,
+     0.7999
+    ],
+    "source": "data/frozen/ladder_b2_mantra.parquet",
+    "locator": "one validation-selected rung per seed; column test_auroc"
+   },
+   "hopse": {
+    "mean": 0.9144,
+    "sd": 0.0144,
+    "per_seed": [
+     0.8983,
+     0.926,
+     0.919
+    ],
+    "source": "data/frozen/hopse_sweep_mantra.parquet",
+    "locator": "per-seed argmax val_accuracy over 12 configs; column test_auroc"
+   },
+   "note": "seeds 42/43/44; selection rule reproduces deck values 0.52 / 0.76\u00b10.05 / 0.91\u00b10.01"
+  },
+  "count_conditional_auroc_seed43": {
+   "menu": 0.5,
+   "gccn": 0.5056,
+   "hopse": 0.7909,
+   "source": "data/frozen/mantra_attr_fig.json",
+   "locator": "models/<m>/count_conditional_auroc; recomputed exactly from models/<m>/test_table within identical-(V,E,F) groups",
+   "matched_groups": 4,
+   "matched_complexes": 5645,
+   "matched_cross_class_pairs": 1318027
+  },
+  "seed43_test_auroc_crosscheck": {
+   "menu": 0.5209,
+   "gccn": 0.7854,
+   "hopse": 0.926,
+   "source": "data/frozen/mantra_attr_fig.json",
+   "locator": "models/<m>/test_auroc"
+  },
+  "count_only_auroc": {
+   "value": 0.7839,
+   "source": "data/frozen/mantra_attr_fig.json",
+   "locator": "AUROC of triangle count F as score for label==1 over models/menu/test_table (E gives the same 0.7839; E=3F/2)"
+  },
+  "mean_triangles": {
+   "non_orientable": 23.1633,
+   "orientable": 20.4795,
+   "n_non_orientable": 9930,
+   "n_orientable": 855,
+   "source": "data/frozen/mantra_attr_fig.json",
+   "locator": "mean of F by label over test_table; label 1 = NON-orientable"
+  },
+  "triangle_count_distribution": {
+   "bins_F": [
+    [
+     8,
+     10
+    ],
+    [
+     12,
+     14
+    ],
+    [
+     16,
+     18
+    ],
+    [
+     20,
+     22
+    ],
+    [
+     24,
+     26
+    ],
+    [
+     28,
+     30
+    ]
+   ],
+   "share_orientable": [
+    0.0035,
+    0.0187,
+    0.1064,
+    0.6246,
+    0.2444,
+    0.0023
+   ],
+   "share_non_orientable": [
+    0.0,
+    0.0004,
+    0.0379,
+    0.4136,
+    0.52,
+    0.0281
+   ],
+   "source": "data/frozen/mantra_attr_fig.json",
+   "locator": "per-class share of test_table complexes with F in each bin (label 1 = NON-orientable)"
+  },
+  "label_semantics": "attr-fig JSON: label 1 = majority = NON-orientable; p = p(non-orientable); orientable_class field = 0. The matched_groups_smallest role names are swapped in the frozen JSON and are not used here."
+ },
+ "figure_B_mantra_fix": {
+  "balanced_accuracy_ladder_3seed_mean": {
+   "counts_only": 0.5054,
+   "plus_local_structural": 0.5407,
+   "plus_signed_hodge_spectral": 0.8764,
+   "source": "data/frozen/reference/synthesis_report/claims_ledger.json",
+   "locator": "claims ids count_ceiling / orient_struct / orient_spec (experiment exp_01kzv8eb90fwat82mt8ke8fj3z; per-seed values not in the frozen snapshot, so no error bars are drawn)"
+  },
+  "hopse_unsigned_spectral_reference": {
+   "balanced_accuracy_mean": 0.7916,
+   "sd": 0.0088,
+   "per_seed": [
+    0.7815,
+    0.7961,
+    0.7973
+   ],
+   "source": "data/frozen/hopse_sweep_mantra.parquet",
+   "locator": "per-seed argmax val_accuracy; column test_balanced_accuracy (deck value 0.79\u00b10.01)"
+  },
+  "chance": 0.5
+ }
+}

@@ -1,0 +1,21 @@
+% ======================================================================
+% Section 8 -- Limitations (one paragraph, concise). No em dashes.
+% ======================================================================
+\section{Limitations}
+\label{sec:limitations}
+
+\method has three main limitations. First, although greedy pruning is
+far cheaper than search-based explainers at benchmark scale
+(\cref{tab:graph-benchmarks}), its cost grows quadratically with the
+number of cells, so complexes with thousands of cells would require
+restricting the search to the model's receptive field. Second, GEA
+scores the composition of explainer and model against human
+annotations. On Fluoride-Carbonyl, for example, the explained model
+scores coalitions outside the annotated functional group above the
+group itself on 96\% of candidates, so no faithful method can reach a
+high GEA there. We report the alignment gap $\Delta$ alongside GEA to
+separate explainer quality from this model property. Third, all
+prediction-explanation experiments target complex-level
+classification; explaining node-level predictions would restrict
+players to the target's receptive field, and we leave it to future
+work.

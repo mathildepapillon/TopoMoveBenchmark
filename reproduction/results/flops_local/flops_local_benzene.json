@@ -1,0 +1,35 @@
+{
+ "dataset": "benzene",
+ "counter": "torch.utils.flop_counter.FlopCounterMode; dense matmul/conv ops, sparse scatter propagation uncounted (identical accounting across arms); backward profiled through a scalar sum of logits",
+ "per_mask": {
+  "1921": {
+   "k": 5,
+   "train_epoch_flops": 16742435200,
+   "eval_pass_flops": 1440905088,
+   "profile_seconds": 15.09
+  },
+  "2015": {
+   "k": 10,
+   "train_epoch_flops": 40666556800,
+   "eval_pass_flops": 3697022848,
+   "profile_seconds": 18.08
+  },
+  "2047": {
+   "k": 11,
+   "train_epoch_flops": 44917836160,
+   "eval_pass_flops": 4001503104,
+   "profile_seconds": 19.12
+  }
+ },
+ "source": "local ladder_b2 backfill (rung1/rung2 masks, seeds 42-44, plus 2047); model cell/topotune_nonlinear_exact, full 11-vocabulary bit order",
+ "stem_epochs": 5,
+ "prune_epoch": 5,
+ "seeds": [
+  42,
+  43,
+  44
+ ],
+ "torch_version": "2.3.0+cu121",
+ "device": "cuda",
+ "gpu": "NVIDIA H200"
+}

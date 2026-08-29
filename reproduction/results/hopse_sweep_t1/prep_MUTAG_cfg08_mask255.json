@@ -1,0 +1,5 @@
+{
+ "dataset": "MUTAG",
+ "tag": "cfg08_mask255",
+ "preprocessing_seconds": 0.006523609161376953
+}

@@ -1,0 +1,53 @@
+{
+ "dataset": "mutagenicity_gxai",
+ "counter": "torch.utils.flop_counter.FlopCounterMode; dense matmul/conv ops, sparse scatter propagation uncounted (identical accounting across arms); backward profiled through a scalar sum of logits",
+ "per_mask": {
+  "1135": {
+   "k": 7,
+   "train_epoch_flops": 7229606400,
+   "eval_pass_flops": 602830848,
+   "profile_seconds": 2.39
+  },
+  "1255": {
+   "k": 7,
+   "train_epoch_flops": 7275088384,
+   "eval_pass_flops": 607975424,
+   "profile_seconds": 2.41
+  },
+  "1391": {
+   "k": 8,
+   "train_epoch_flops": 7275088384,
+   "eval_pass_flops": 607975424,
+   "profile_seconds": 2.5
+  },
+  "1895": {
+   "k": 8,
+   "train_epoch_flops": 7295224320,
+   "eval_pass_flops": 610080768,
+   "profile_seconds": 2.53
+  },
+  "2039": {
+   "k": 10,
+   "train_epoch_flops": 8626457088,
+   "eval_pass_flops": 753276928,
+   "profile_seconds": 2.7
+  },
+  "2047": {
+   "k": 11,
+   "train_epoch_flops": 9246591488,
+   "eval_pass_flops": 819730432,
+   "profile_seconds": 2.81
+  }
+ },
+ "source": "local ladder_b2 backfill (rung1/rung2 masks, seeds 42-44, plus 2047); model cell/topotune_nonlinear_exact, full 11-vocabulary bit order",
+ "stem_epochs": 5,
+ "prune_epoch": 5,
+ "seeds": [
+  42,
+  43,
+  44
+ ],
+ "torch_version": "2.3.0+cu121",
+ "device": "cuda",
+ "gpu": "NVIDIA H200"
+}

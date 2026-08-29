@@ -1,0 +1,41 @@
+# Per-dataset facts carried over from the experiment record (handoff §4/§5).
+# Costs are mean from-scratch training runs on the original cluster's H100s —
+# re-measure on this cluster (H200s) before using them in any priced claim;
+# they are budgeting hints only.
+
+defaults:
+  seeds: [42, 43, 44, 45, 46]   # 5-seed marker-arm convention
+  stem_epochs: 5
+  passes: 128
+  stability_passes: 512
+  k_values: [2, 3, 6]           # k=6 safe default; k=3 wins Mutagenicity/citation
+  gpu_cap_concurrent: 48
+
+datasets:
+  Benzene:
+    mean_run_seconds_orig: 641
+    notes: >
+      20% adjacency cliff is a property of the space (adjacency-free subsets
+      cap ~0.74; CWN menu candidate scores the identical 0.737). Seed 43 shows
+      substitute-commitment (budget-resistant); seed 44 borderline.
+  Fluoride:
+    mean_run_seconds_orig: 529
+    notes: >
+      N* = 1.2 stated exception (Pareto framing). Seeds 42/43 show
+      substitute-commitment; anchored arm expected to repair (+0.05 means
+      predicted for k=2/3).
+  Mutagenicity:
+    mean_run_seconds_orig: null
+    notes: motif GEA beats flat baselines here (leg 1); k=3 wins (leg 2).
+  NCI1:
+    mean_run_seconds_orig: 232
+    notes: N* = 1.5 stated exception; substitute-commitment mechanism dataset.
+  Cora:
+    mean_run_seconds_orig: 40
+    notes: citation graphs 23-54s per run; N* miss diagnosed as adjacency-drop.
+  Citeseer:
+    mean_run_seconds_orig: 40
+    notes: selection bars 0.011-0.013 (training-noise level, fine as-is).
+  Pubmed:
+    mean_run_seconds_orig: 54
+    notes: citation-family defaults.

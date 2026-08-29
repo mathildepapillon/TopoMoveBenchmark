@@ -1,0 +1,28 @@
+% ======================================================================
+% tables/protocol_uniformity.tex
+% *** TODO(generated): scripts/make_tables.py will emit this table   ***
+% *** from data/frozen/ run manifests. The current contents are a    ***
+% *** hand-written placeholder stub; do not hand-fill values.        ***
+% ======================================================================
+\begin{table}[h]
+\centering
+\caption{Protocol uniformity across methods and families: one selection
+  pipeline, one seed set, one cost convention.
+  \todoresearcherinline{TODO(generated): emitted by
+  scripts/make\_tables.py from run manifests.}}
+\label{tab:protocol-uniformity}
+\small
+\begin{tabular}{lll}
+\toprule
+Protocol element & Ours (GCCN / HOPSE) & Baselines \\
+\midrule
+Seeds & \unfrozen{\ResSeedList} & \unfrozen{\ResSeedList} \\
+Selection rule & per-seed validation-best & per-seed validation-best \\
+FLOPs convention & \multicolumn{2}{l}{identical (\cref{app:flops-conventions})} \\
+Brief-run epochs & \unfrozen{\ResStemEpochs} & --- \\
+Attribution budget & \unfrozen{\ResSampledPasses} passes
+  ($\sim$\unfrozen{\ResUniqueEvals} unique evals) & --- \\
+\ResTBD & \ResTBD & \ResTBD \\
+\bottomrule
+\end{tabular}
+\end{table}

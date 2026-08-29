@@ -1,0 +1,9 @@
+gccn_full rc=0
+menu_21 rc=0
+menu_329 rc=0
+menu_72 rc=0
+menu_129 rc=0
+menu_26 rc=0
+menu_479 rc=0
+hopse_full rc=0
+sweep_8 rc=0

@@ -1,0 +1,21 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+external/TopoBench/
+data/frozen/*
+!data/frozen/.gitkeep
+paper/*.pdf
+paper/build/
+wandb/
+*.egg-info/
+figures/out/
+data/_staging/
+
+# run artifacts that stay cluster-side (checkpoints, scheduler logs, exports)
+slurm_logs/
+results/**/runs/
+results/**/*.ckpt
+results/balanced_eval_runs/
+overleaf_export/
+overleaf_export.zip

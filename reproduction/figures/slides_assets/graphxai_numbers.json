@@ -1,0 +1,156 @@
+{
+ "figure": "graphxai_comparison.png / .svg",
+ "metric": "GEA -- node-projected ground-truth explanation agreement (Jaccard, higher better)",
+ "built_from": "data/frozen/attribution4/all_tables.json (frozen; identical to data/_staging_t1/table1/exp4_tables/all_tables.json), experiment exp_01kzt8hvm7eqytdzfejz55a1h5",
+ "conventions": {
+  "ours_rows": "campaign selection (smallest_gt_positive), per-seed mean, sd over 5 seeds",
+  "baseline_rows": "baseline suite (data/frozen/baselines2, exp_01kzs9avf8e18vw7d6ptc94rqt): best of GNNExplainer/PGExplainer/SubgraphX on GCN/GIN, graphxai_default and selected_on_train variants pooled, single training run each -- no per-seed error bars exist",
+  "forge_rows": "LITERATURE values, FORGE paper v5 (arXiv:2406.03253, AAAI 2025), 10 seeds, explaining flat GNNs; cite-only per data/frozen/baselines2/manifest.json#forge -- NOT verifiable against local frozen data"
+ },
+ "deck_discrepancies": [
+  {
+   "cell": "TopoSHAP explaining the better flat GNN, Alkane-Carbonyl",
+   "deck_value": 0.343,
+   "frozen_value": 0.336,
+   "detail": "deck's 0.343 traces to motif_matched_correct (gcn, gea_node_mean=0.3428), a non-primary selection; the campaign/primary selection (smallest_gt_positive, used for every other cell in the row and carried by baseline_join) gives 0.3356. Figure plots the frozen primary value 0.336."
+  },
+  {
+   "cell": "FORGE literature rows vs frozen forge_reference_gea",
+   "detail": "data/frozen/baselines2/summary.json carries a forge_reference_gea column with per-explainer values (e.g. Benzene subgraphx 0.622) that match neither deck FORGE row; the deck itself notes earlier arXiv revisions differ. Treated as literature, plotted as deck-stated v5 values."
+  }
+ ],
+ "cross_references": {
+  "claims_ledger": "data/frozen/reference/synthesis_report/claims_ledger.json (sgx_ours_*, sgx_ref_*, benzene_chance)",
+  "macros": "paper/results_macros.tex (\\ResGEAOurs*, \\ResGEASubgraphX*, \\ResGEARandomBenzene)"
+ },
+ "datasets": {
+  "Benzene": {
+   "toposhap_on_gccn": {
+    "gea": 0.724693,
+    "sd_over_5_seeds": 0.21598,
+    "explained_model": "topotune_nonlinear_exact_plus",
+    "provenance": "data/frozen/attribution4/all_tables.json#baseline_join.rows[source=campaign, dataset=Benzene, model=topotune_nonlinear_exact_plus].gea_node_mean/.gea_node_sd"
+   },
+   "toposhap_on_best_flat_gnn": {
+    "gea": 0.783767,
+    "sd_over_5_seeds": 0.162772,
+    "explained_model": "gin",
+    "provenance": "data/frozen/attribution4/all_tables.json#baseline_join.rows[source=campaign, dataset=Benzene, model=gin].gea_node_mean/.gea_node_sd (max over gcn/gin)"
+   },
+   "best_flat_baseline": {
+    "gea": 0.751589,
+    "explainer": "subgraphx",
+    "explained_model": "gin",
+    "provenance": "data/frozen/attribution4/all_tables.json#baseline_join.rows[source=baseline_suite, dataset=Benzene, explainer=subgraphx, model=gin].gea_node_mean (max over explainer x model; single training run, sd is per-graph spread, not per-seed)"
+   },
+   "random_control": {
+    "gea": 0.238263,
+    "provenance": "data/frozen/attribution4/all_tables.json#baseline_join.rows[source=baseline_suite, dataset=Benzene, explainer=random].gea_node_mean"
+   },
+   "forge_best_plain_reported": {
+    "gea": 0.456,
+    "provenance": "LITERATURE: FORGE paper v5 (arXiv:2406.03253), 10 seeds, explaining flat GNNs -- no local frozen source"
+   },
+   "forge_best_boosted_reported": {
+    "gea": 0.772,
+    "provenance": "LITERATURE: FORGE paper v5 (arXiv:2406.03253), 10 seeds, explaining flat GNNs -- no local frozen source"
+   }
+  },
+  "Fluoride-Carbonyl": {
+   "toposhap_on_gccn": {
+    "gea": 0.636612,
+    "sd_over_5_seeds": 0.045367,
+    "explained_model": "topotune_nonlinear_exact_plus",
+    "provenance": "data/frozen/attribution4/all_tables.json#baseline_join.rows[source=campaign, dataset=FluorideCarbonyl, model=topotune_nonlinear_exact_plus].gea_node_mean/.gea_node_sd"
+   },
+   "toposhap_on_best_flat_gnn": {
+    "gea": 0.51465,
+    "sd_over_5_seeds": 0.085743,
+    "explained_model": "gin",
+    "provenance": "data/frozen/attribution4/all_tables.json#baseline_join.rows[source=campaign, dataset=FluorideCarbonyl, model=gin].gea_node_mean/.gea_node_sd (max over gcn/gin)"
+   },
+   "best_flat_baseline": {
+    "gea": 0.483236,
+    "explainer": "pgexplainer",
+    "explained_model": "gin",
+    "provenance": "data/frozen/attribution4/all_tables.json#baseline_join.rows[source=baseline_suite, dataset=FluorideCarbonyl, explainer=pgexplainer, model=gin].gea_node_mean (max over explainer x model; single training run, sd is per-graph spread, not per-seed)"
+   },
+   "random_control": {
+    "gea": 0.209533,
+    "provenance": "data/frozen/attribution4/all_tables.json#baseline_join.rows[source=baseline_suite, dataset=FluorideCarbonyl, explainer=random].gea_node_mean"
+   },
+   "forge_best_plain_reported": {
+    "gea": 0.233,
+    "provenance": "LITERATURE: FORGE paper v5 (arXiv:2406.03253), 10 seeds, explaining flat GNNs -- no local frozen source"
+   },
+   "forge_best_boosted_reported": {
+    "gea": 0.441,
+    "provenance": "LITERATURE: FORGE paper v5 (arXiv:2406.03253), 10 seeds, explaining flat GNNs -- no local frozen source"
+   }
+  },
+  "Mutagenicity": {
+   "toposhap_on_gccn": {
+    "gea": 0.744229,
+    "sd_over_5_seeds": 0.358612,
+    "explained_model": "topotune_nonlinear_exact_plus",
+    "provenance": "data/frozen/attribution4/all_tables.json#baseline_join.rows[source=campaign, dataset=Mutagenicity, model=topotune_nonlinear_exact_plus].gea_node_mean/.gea_node_sd"
+   },
+   "toposhap_on_best_flat_gnn": {
+    "gea": 0.550181,
+    "sd_over_5_seeds": 0.33925,
+    "explained_model": "gcn",
+    "provenance": "data/frozen/attribution4/all_tables.json#baseline_join.rows[source=campaign, dataset=Mutagenicity, model=gcn].gea_node_mean/.gea_node_sd (max over gcn/gin)"
+   },
+   "best_flat_baseline": {
+    "gea": 0.39362,
+    "explainer": "subgraphx",
+    "explained_model": "gin",
+    "provenance": "data/frozen/attribution4/all_tables.json#baseline_join.rows[source=baseline_suite, dataset=Mutagenicity, explainer=subgraphx, model=gin].gea_node_mean (max over explainer x model; single training run, sd is per-graph spread, not per-seed)"
+   },
+   "random_control": {
+    "gea": 0.128696,
+    "provenance": "data/frozen/attribution4/all_tables.json#baseline_join.rows[source=baseline_suite, dataset=Mutagenicity, explainer=random].gea_node_mean"
+   },
+   "forge_best_plain_reported": {
+    "gea": 0.38,
+    "provenance": "LITERATURE: FORGE paper v5 (arXiv:2406.03253), 10 seeds, explaining flat GNNs -- no local frozen source"
+   },
+   "forge_best_boosted_reported": {
+    "gea": 0.339,
+    "provenance": "LITERATURE: FORGE paper v5 (arXiv:2406.03253), 10 seeds, explaining flat GNNs -- no local frozen source"
+   }
+  },
+  "Alkane-Carbonyl": {
+   "toposhap_on_gccn": {
+    "gea": 0.235537,
+    "sd_over_5_seeds": 0.197805,
+    "explained_model": "topotune_nonlinear_exact_plus",
+    "provenance": "data/frozen/attribution4/all_tables.json#baseline_join.rows[source=campaign, dataset=AlkaneCarbonyl, model=topotune_nonlinear_exact_plus].gea_node_mean/.gea_node_sd"
+   },
+   "toposhap_on_best_flat_gnn": {
+    "gea": 0.335584,
+    "sd_over_5_seeds": 0.174296,
+    "explained_model": "gcn",
+    "provenance": "data/frozen/attribution4/all_tables.json#baseline_join.rows[source=campaign, dataset=AlkaneCarbonyl, model=gcn].gea_node_mean/.gea_node_sd (max over gcn/gin)"
+   },
+   "best_flat_baseline": {
+    "gea": 0.235584,
+    "explainer": "subgraphx",
+    "explained_model": "gcn",
+    "provenance": "data/frozen/attribution4/all_tables.json#baseline_join.rows[source=baseline_suite, dataset=AlkaneCarbonyl, explainer=subgraphx, model=gcn].gea_node_mean (max over explainer x model; single training run, sd is per-graph spread, not per-seed)"
+   },
+   "random_control": {
+    "gea": 0.141693,
+    "provenance": "data/frozen/attribution4/all_tables.json#baseline_join.rows[source=baseline_suite, dataset=AlkaneCarbonyl, explainer=random].gea_node_mean"
+   },
+   "forge_best_plain_reported": {
+    "gea": 0.114,
+    "provenance": "LITERATURE: FORGE paper v5 (arXiv:2406.03253), 10 seeds, explaining flat GNNs -- no local frozen source"
+   },
+   "forge_best_boosted_reported": {
+    "gea": 0.304,
+    "provenance": "LITERATURE: FORGE paper v5 (arXiv:2406.03253), 10 seeds, explaining flat GNNs -- no local frozen source"
+   }
+  }
+ }
+}

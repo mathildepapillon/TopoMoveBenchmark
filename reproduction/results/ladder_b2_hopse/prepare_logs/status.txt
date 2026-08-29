@@ -1,0 +1,4 @@
+mutagenicity_gxai rc=0
+NCI1 rc=0
+fluoride_carbonyl rc=0
+benzene rc=0

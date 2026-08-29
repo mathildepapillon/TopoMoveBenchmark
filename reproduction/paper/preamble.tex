@@ -1,0 +1,116 @@
+% ======================================================================
+% preamble.tex -- packages, theorem environments, draft-mode machinery
+% ======================================================================
+
+% ---------------------------------------------------------------- fonts
+% (guarded so the skeleton also compiles under XeTeX/LuaTeX engines,
+% e.g. tectonic; pdflatex behavior is unchanged)
+\ifdefined\XeTeXrevision\else\ifdefined\directlua\else
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+\fi\fi
+\IfFileExists{microtype.sty}{\usepackage{microtype}}{}
+
+% ------------------------------------------------------------- packages
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{xspace}
+\usepackage{natbib}          % official ICLR style ships its own .bst; see main.tex
+
+% Boxed-theory environment: tcolorbox if available, framed as fallback.
+\IfFileExists{tcolorbox.sty}{%
+  \usepackage{tcolorbox}%
+  \newtcolorbox{theorybox}{%
+    colback=gray!6, colframe=black!70, boxrule=0.6pt, arc=1.5mm,
+    left=7pt, right=7pt, top=6pt, bottom=6pt}%
+}{%
+  \usepackage{framed}%
+  \newenvironment{theorybox}{\begin{framed}}{\end{framed}}%
+}
+
+% hyperref + cleveref last
+\usepackage[colorlinks=true,
+            linkcolor=blue!55!black,
+            citecolor=green!40!black,
+            urlcolor=blue!55!black]{hyperref}
+\usepackage[capitalize,noabbrev]{cleveref}
+
+% --------------------------------------------------- theorem environments
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{assumption}{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+% Fixed-label statements for the boxed theory blocks (T-numbered, so they
+% survive reordering of the ordinary theorem counter).
+\newtheorem*{propositionT}{Proposition~T1}
+\newtheorem*{corollaryT}{Corollary~T2}
+\newtheorem*{propositionTrank}{Proposition~T3}
+
+% ======================================================================
+% Draft-mode machinery
+% ======================================================================
+
+% ----- frozen-results toggle ------------------------------------------
+% While results are UNFROZEN (handoff-sourced numbers, not yet regenerated
+% from data/frozen/), every number referenced via \unfrozen{...} carries a
+% gray "UNFROZEN" superscript. Flip the boolean below once
+% scripts/make_tables.py has regenerated results_macros.tex from
+% data/frozen/ -- all markers disappear and numbers render plainly.
+\newif\ifFrozenResults
+\FrozenResultstrue   % results frozen 2026-08-18 (manifest in data/frozen/MANIFEST.json)
+
+\newcommand{\unfrozen}[1]{%
+  \ifFrozenResults
+    {#1}%
+  \else
+    {#1}\textsuperscript{\,\textcolor{gray}{\tiny\textsf{UNFROZEN}}}%
+  \fi}
+
+% ----- researcher TODO margin notes -----------------------------------
+% \todoresearcher{...}       margin note (body text only)
+% \todoresearcherinline{...} inline note -- REQUIRED inside floats and
+%                            captions, where \marginpar is illegal.
+\newcommand{\todoresearcher}[1]{%
+  \marginpar{\raggedright\scriptsize\textcolor{red!70!black}{%
+    \textbf{TODO(researcher):} #1}}}
+\newcommand{\todoresearcherinline}[1]{%
+  \textcolor{red!70!black}{\scriptsize\textbf{TODO(researcher):} #1}}
+
+% ----- misc helper macros ---------------------------------------------
+\newcommand{\method}{TopoSHAP\xspace}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+% Bolded one-sentence claim opening an experiment subsection.
+\newcommand{\expclaim}[1]{\noindent\textbf{#1}\par\smallskip}
+
+% Boxed practitioner's recipe: plain-language numbered steps, no math.
+\newenvironment{recipebox}{\begin{theorybox}\noindent
+  \textbf{Practitioner's recipe.}\begin{enumerate}\setlength{\itemsep}{1pt}}
+  {\end{enumerate}\end{theorybox}}
+
+% Neighborhood names (message-passing routes); always "neighborhoods",
+% never "relations".
+\newcommand{\nbhd}[1]{\texttt{#1}}
+
+% Placeholder box for figures whose PDF has not been generated yet.
+\newcommand{\figureplaceholder}[1]{%
+  \fbox{\parbox[c][0.30\linewidth][c]{0.95\linewidth}{%
+    \centering\color{gray}\textsf{FIGURE PLACEHOLDER}\\[2pt]
+    \texttt{\detokenize{#1}}}}}
+
+% Convenience shorthand
+\newcommand{\eg}{e.g.,\xspace}
+\newcommand{\ie}{i.e.,\xspace}
+\newcommand{\rk}{\operatorname{rk}}

@@ -1,0 +1,98 @@
+% ======================================================================
+% TopoSHAP -- ICLR 2027 submission (skeleton)
+%
+% Build:  make          (pdflatex + bibtex, output in build/)
+% Clean:  make clean
+%
+% NOTE: iclr2027_conference.sty is a PLACEHOLDER; swap for the official
+% ICLR 2027 style file (and its .bst) when released.
+% ======================================================================
+\documentclass[10pt,letterpaper]{article}
+
+\usepackage{iclr2027_conference}   % PLACEHOLDER style -- see file header
+\input{preamble}
+\input{results_macros}
+
+% ----- working title (keep as a macro so it is easy to change) --------
+\newcommand{\papertitle}{TopoSHAP: Game-Theoretic Explanations for
+  Interpretable and Efficient Topological Deep Learning}
+
+\title{\papertitle}
+% Double-blind: the placeholder style prints the anonymous block below
+% whenever \iclrfinalcopy is not set; \author is only used in final copy.
+\author{Anonymous authors\\ Paper under double-blind review}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Topological deep learning (TDL) models interactions beyond pairwise
+edges, such as rings in molecules and cavities in meshes. Existing
+post-hoc explainers operate only on nodes and edges, so they cannot
+represent the higher-order structures these models use. We introduce
+\method, a model-agnostic method that explains predictions on
+combinatorial complexes through a cooperative game over cells. It
+produces per-cell Shapley attributions and identifies the smallest
+sub-complex sufficient to preserve a prediction. For graphs, \method
+reduces to induced-subgraph removal and matches or outperforms GNN
+explainers on GraphXAI benchmarks while costing up to 500 times less
+than search-based methods. The same implementation extends directly to
+higher-order models: it recovers motifs in lifted molecular benchmarks,
+achieves the highest faithfulness on topological datasets without
+ground-truth explanations, and identifies decision-relevant structures
+in native triangulations. Recasting neighborhoods as players and
+validation accuracy as the game value also allows \method to select
+architectures at roughly one-tenth the cost of a full sweep. Finally,
+we find that standard feature liftings encode structural information in
+features, reducing explainability. A structure-only lifting improves
+both predictive accuracy and explanation quality.
+\end{abstract}
+
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_preliminaries}
+\input{sections/04_framework}
+\input{sections/05_explaining_predictions}
+\input{sections/06_explaining_performance}
+\input{sections/08_limitations}
+\input{sections/09_conclusion}
+
+% ----- required/recommended statements (do not count toward page limit)
+% TODO(researcher): review wording of both statements before submission.
+\subsection*{AI use statement}
+We used generative AI tools (Claude) for code implementation, experiment
+orchestration, data analysis, and manuscript drafting, in every case
+under author direction and review. The research questions, method
+design, experimental protocol, and framing are the authors' own. All
+AI-assisted code is exercised by the released test suite, the exactness
+of the attribution engine is verified against brute-force enumeration
+to machine precision, and every number and figure in the paper
+regenerates from the frozen experimental record by one command. We take
+responsibility for the final content of this work.
+
+\subsection*{Reproducibility statement}
+Every number and figure in this paper is generated from a frozen
+experimental record by a single script and referenced in the text as a
+macro; none is typed by hand. The exact selection protocol, seeds,
+FLOPs conventions, and dataset scope are specified in
+\cref{app:experimental}, and the evidence layers (frozen rule,
+out-of-sample validation, pre-registered battery) in
+\cref{app:selection}. The full pipeline, including runners, frozen
+results, tests, and the paper build, is released as open source upon
+publication.
+
+% ----- bibliography ----------------------------------------------------
+% TODO: switch to the official iclr2027_conference.bst when released.
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\appendix
+\input{sections/appendix_glossary}
+\input{sections/appendix_proofs}
+\input{sections/appendix_selection}
+\input{sections/appendix_experimental}
+\input{sections/appendix_tables}
+\input{sections/appendix_figures}
+
+\end{document}

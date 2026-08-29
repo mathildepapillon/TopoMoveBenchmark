@@ -1,0 +1,81 @@
+% ======================================================================
+% Appendix A -- Proofs
+% ======================================================================
+\section{Proofs}
+\label{app:proofs}
+
+\subsection{Proof of Proposition T1 (Non-Identifiability of Substitutes)}
+\label{app:proof-t1}
+
+% TODO(researcher): finalize statement + proof.
+\todoresearcher{Finalize the exact statement of Proposition T1
+(masked-coalition value functions cannot distinguish certain
+neighborhood substitutes without retraining) and write the proof.
+Sketch: construct two parameterizations of the brief run realizing the
+same
+function with credit routed through either substitute; show
+$v_{\mathrm{prune}}$ is identical on all coalitions for one
+parameterization but not under retraining.}
+
+\begin{proof}[Proof sketch (placeholder)]
+TBD. % TODO(researcher)
+\end{proof}
+
+\subsection{Statement and Proof Sketch of Proposition T3 (Rank Floor)}
+\label{app:proof-t3}
+
+% TODO(researcher): finalize statement + proof.
+\todoresearcher{Finalize the exact statement of Proposition T3 (the
+rank floor) and write the full proof.}
+
+\begin{theorybox}
+\begin{propositionTrank}[Rank floor; statement to be finalized]
+% (no \label: unnumbered T-statement; refer to it as "Proposition~T3")
+Let $\mathcal{C}$ be a complex with $R$ ranks and $S$ a coalition of
+neighborhoods. If the rank pairs connected by the neighborhoods in $S$
+do not span the rank hierarchy, then every cell of each unspanned rank
+has an empty composed receptive field: no input signal can reach it
+through any sequence of message-passing layers, and each such cell is a
+null player of the masked game. Spanning $R$ ranks requires on the
+order of $R$ neighborhoods; hence $k \ge R$ is a structural floor on
+the size of any coalition that uses the whole complex---$k = 3$ for the
+2-complexes (nodes, edges, faces) of molecular benchmarks. \emph{Exact
+statement TBD by researcher.}
+\end{propositionTrank}
+\end{theorybox}
+
+\begin{proof}[Proof sketch]
+Each neighborhood is an operator between one pair of ranks
+(\cref{sec:prelim-gccn}), so a coalition $S$ induces a
+rank-connectivity multigraph $G_S$ on the ranks of the complex, with
+one edge per neighborhood in $S$. Composed receptive fields grow only
+along walks of $G_S$: after any number of message-passing layers, a
+cell of rank $r$ can have received signal only from cells whose ranks
+lie in the connected component of $r$ in $G_S$. If a rank is
+disconnected from every rank carrying input signal, all of its cells
+have empty composed receptive fields; masking such a cell changes no
+coalition value, so it is a null player and the null-player axiom
+assigns it exactly zero. Connecting all ranks of an $R$-rank complex
+requires a connected spanning subgraph of $G_S$, hence on the order of
+$R$ neighborhood edges; accounting for the directionality of routes
+and for which ranks carry input signal versus readout yields the floor
+$k \ge R$ stated above and discussed in \cref{app:selection-rankfloor}
+($k \ge 3$ for the 2-complexes of the molecular benchmarks).
+% TODO(researcher): tighten the directionality/readout counting into
+% the final constant.
+\end{proof}
+
+\subsection{Proof of Corollary T2 (Hypergraph Message Passing)}
+\label{app:proof-t2}
+
+% TODO(researcher): finalize statement + proof.
+\todoresearcher{Finalize the exact statement of Corollary T2 (the
+framework extends to hypergraph message passing; carried by theory only,
+the hypergraph experiment was cut) and write the proof. Sketch:
+hypergraph incidence defines the neighborhood set; players, masking, and
+both value functions are unchanged; axioms follow from
+\cref{eq:shapley,eq:interaction} verbatim.}
+
+\begin{proof}[Proof sketch (placeholder)]
+TBD. % TODO(researcher)
+\end{proof}

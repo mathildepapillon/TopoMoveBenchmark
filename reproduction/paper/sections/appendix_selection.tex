@@ -1,0 +1,182 @@
+% ======================================================================
+% Appendix -- Architecture selection: details, analyses, and evidence
+% structure. Depth moved out of the main text (researcher-set page
+% budget); main-text sections reference these subsections.
+% Binding style rules apply here too.
+% ======================================================================
+\section{Architecture Selection: Details and Evidence Structure}
+\label{app:selection}
+
+\subsection{Full Selection Results}
+\label{app:selection-table}
+
+\Cref{tab:performance-summary} tabulates every selection arm and sweep
+marker of \cref{fig:lead,fig:lead-bench} with exact values and
+per-row cost multiples.
+
+\input{tables/performance_summary}
+
+\subsection{The Candidate Sequence, Formally}
+\label{app:selection-ladder}
+
+The players are the family's neighborhood-indexed components (GCCN
+message-passing routes; HOPSE encoding blocks;
+\cref{sec:framework-game2}). Backward elimination starts from the full
+coalition and repeatedly removes the component whose removal is
+cheapest on $v_{\mathrm{prune}}$, while that cost is below the
+validation binomial floor $\sqrt{p(1-p)/m}$. Because each architecture
+is nested in the previous one, the eliminations yield one candidate
+per size. The candidate choice was fixed before any $B \ge 2$
+experiment ran. The \emph{stop candidate} is the smallest
+architecture whose next removal would cost more than the floor.
+Candidates $2..B$ are the architectures with the highest cheap-game
+value at sizes not yet taken. $B{=}1$ trains the stop candidate only
+($\sim$\unfrozen{\ResLadderCostBOne} training-run equivalents);
+$B{=}2$ adds one candidate ($\sim$\unfrozen{\ResLadderCostBTwo});
+$B{=}\unfrozen{\ResMenuEntries}$ with literature architectures
+recovers the menu; $B{=}\text{all}$ is the sweep. Exact protocol in
+\cref{app:pipeline-protocol}.
+
+\subsection{Why Not a Sorted-Shapley Elbow: Substitute-Commitment}
+\label{app:selection-commitment}
+
+Sorting components by Shapley value and cutting at the elbow fails
+under \emph{redundancy}: when two components can do the same job, the
+briefly trained full model commits to one (which one varies with the
+training seed), and the attribution faithfully reports that model's
+realized division of labor rather than what a retrained model could
+do (Proposition~T1). We
+call this \emph{substitute-commitment}; it independently reproduces
+the valuation-is-not-selection result of \citet{fryer2021shapley} in
+the wild. Pooled correlation between the brief run's Shapley reliance
+and post-pruning viability is weak: $\rho =$ \unfrozen{\ResPooledRho}
+(95\% CI [\unfrozen{\ResPooledRhoCILow},
+\unfrozen{\ResPooledRhoCIHigh}]), consistent with redundancy rather
+than a broken estimator (exact to \unfrozen{\ResExactnessMaxErr} on
+its game). The honest elbow is the greedy \emph{trace}: the sequence
+of measured removal costs along the elimination path, in which a
+redundant component is
+removed for free while the last copy of a function visibly hurts and
+stays.
+
+\begin{figure}[h]
+  \centering
+  \IfFileExists{../figures/out/substitute_commitment.pdf}{%
+    \includegraphics[width=\linewidth]{../figures/out/substitute_commitment.pdf}%
+  }{%
+    \figureplaceholder{figures/out/substitute_commitment.pdf}%
+  }
+  \caption{Substitute-commitment on the Benzene exemplar. Left:
+    per-seed reliance of the briefly trained full model on
+    \nbhd{up\_adjacency-0} vs.\ its incidence substitutes; one seed
+    commits to the adjacency route
+    while the other two lean on an incidence substitute; attribution
+    follows the commitment. Right: post-pruning viability on the exact
+    landscape (leave-one-out and best-subset-without values against
+    the full-vocabulary band): removing the committed route costs at
+    most $-0.0033$ test accuracy ($\approx$1.3 seed-sd), so the
+    commitment is not a necessity. Subset markers carry the record's
+    median seed-sd as a representative whisker. Linear axes.}
+  \label{fig:substitute-commitment}
+\end{figure}
+
+\subsection{Why Backward, Not Forward: The Plateau}
+\label{app:selection-backward}
+
+Growing an architecture from empty fails on briefly trained models: a
+\unfrozen{\ResStemEpochs}-epoch full model masked down to one or
+two components behaves like an untrained model: small-coalition
+values collapse to one-class accuracy (the score of predicting a
+single class for everything), marginal gains read zero, and forward
+greedy stops on arbitrary singletons (Fluoride-Carbonyl
+\unfrozen{\ResForwardFluoride} vs.\ the
+\unfrozen{\ResForwardFluorideRef} reference; Cora
+\unfrozen{\ResForwardCoraMean} $\pm$ \unfrozen{\ResForwardCoraSd};
+exploratory development runs, labeled as such). The plateau replicated
+independently on two clusters and in a second model family
+(\cref{app:trust-details}). The rule itself is sound; on the
+\emph{true} retraining game the same greedy stop is the best rule we
+scored, so the walk, not the rule, was at fault. Backward elimination
+starts at the full model, where the brief run's game is faithful, and only
+interrogates that region: it beats forward greedy on
+\unfrozen{\ResBackwardBeatsForwardWins}/\unfrozen{\ResBackwardBeatsForwardTotal}
+datasets and collapses its seed variance (Cora sd
+\unfrozen{\ResForwardCoraSd} $\to$ \unfrozen{\ResBackwardCoraSd};
+exploratory).
+
+\subsection{The Rank Floor: Discussion}
+\label{app:selection-rankfloor}
+
+Proposition~T3 (statement and proof sketch in \cref{app:proof-t3})
+explains the literature: HOPSE and CWN shipped defaults are exactly
+rank-spanning 3-sets, so fixed $k=3$ looks strong on 2-complex
+benchmark suites: the floor plus a small surplus. The dark blue star
+of \cref{fig:lead-full} is our fixed $k=3$ variant at its true one-run
+cost, strong on these suites for exactly this reason. Off-suite the
+floor is not a law: on MUTAG the true optimal size is
+\unfrozen{\ResMutagTrueKStar} and fixed $k=3$ loses
+\unfrozen{\ResFixedKMutagRegret} against the exact landscape optimum
+(mean regret \unfrozen{\ResFixedKMeanRegret} across the
+\unfrozen{\ResLadderAllTotal} exact landscapes)---the caution against
+reading ``$k=3$ works'' as universal. The campaign measured that tail
+live: the anchored $k{=}3$ arm lands at
+\unfrozen{\ResMutagFixedKLiveAcc} $\pm$
+\unfrozen{\ResMutagFixedKLiveSd} on MUTAG while the $B{=}2$ selection
+holds \unfrozen{\ResMutagLadderBTwoAcc} $\pm$
+\unfrozen{\ResMutagLadderBTwoSd} against the exact optimum
+\unfrozen{\ResMutagExactOpt} (\cref{sec:performance}). The selection
+recovers the floor where it is optimal and grows past it where it is
+not.
+
+\subsection{Evidence Structure: Frozen, Exploratory, Pre-Registered}
+\label{app:selection-evidence}
+
+Selection rules are easy to overfit to the datasets used while
+developing them; we keep three evidence layers separate.
+\textbf{Frozen rule}: the elimination path and its candidate choice
+were fixed before
+any $B \ge 2$ experiment ran and before the out-of-sample scoring; no
+knob was revisited afterwards. \textbf{Out-of-sample validation}:
+\unfrozen{\ResLadderOOSTotal} exhaustively-enumerated architecture
+landscapes (MUTAG, NCI109, ZINC, ZINC-GIN, alkane-carbonyl) were never
+used during development; the candidate sequence contains the exact
+global optimum on \unfrozen{\ResLadderOOSContained}/\unfrozen{\ResLadderOOSTotal}
+(across all \unfrozen{\ResLadderAllTotal} landscapes,
+\unfrozen{\ResLadderAllContained}/\unfrozen{\ResLadderAllTotal}
+exact-zero regret; worst \unfrozen{\ResLadderOOSWorstRegret}),
+validating the \emph{shape} of the rule on true retraining games.
+\textbf{Exploratory vs.\ pre-registered}: the
+\unfrozen{\ResMarkerDatasets}-dataset development suite guided the
+design and its numbers are labeled exploratory; masked-game quality on
+unseen data is the job of the pre-registered confirmatory battery
+(protocol in \cref{app:experimental}), whose verdicts are reported
+as-is. Development heuristics explored and retired are disclosed in
+\cref{app:dev-trajectory}.
+
+\subsection{Baselines: Three Layers of ``Defaults''}
+\label{app:selection-baselines}
+
+``The default'' is not one thing in TDL; the baseline field has three
+layers, and \cref{fig:lead-full} together with
+\cref{tab:performance-summary} represents all three. \textbf{Hardwired architecture constants}: CWN
+\citep{bodnar2021cwn}, CCXN \citep{hajij2020ccxn}, CAN
+\citep{giusti2022can}, SCN and SCCN \citep{yang2022sccnn} fix their
+neighborhood sets in the architecture definition. \textbf{Shipped
+configuration defaults}: TopoTune's
+\unfrozen{\ResTopoTuneRouteDefault}-route default
+\citep{papillon2025topotune}; HOPSE's
+\unfrozen{\ResHopseModelDefaultBlocks}-encoding model default vs.\ its
+\unfrozen{\ResHopseExptDefaultBlocks}-encoding experiment default
+\citep{hopse2025}. The \emph{menu} marker is this layer: the
+\unfrozen{\ResMenuEntries} published fixed architectures priced
+together at their true cost, selected per-seed by validation.
+\textbf{Paper-time sweeps}: TopoTune's
+\unfrozen{\ResTopoTuneSweepStructures} neighborhood structures crossed
+with sub-models; HOPSE's
+\unfrozen{\ResHopseSweepConfigs}-configuration sweep---the pale
+markers, each at the cost of running its whole grid once. Cost
+accounting is uniform across all of them
+(\cref{app:flops-conventions}); HOPSE's preprocessing is charged to
+HOPSE and is FLOPs-cheap but wall-clock-heavy, so the FLOPs axis is
+the one generous to the baselines (wall-clock variant in
+\cref{app:figures}).

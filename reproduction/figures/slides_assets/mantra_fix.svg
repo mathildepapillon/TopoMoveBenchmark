@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="921.6pt" height="457.2pt" viewBox="0 0 921.6 457.2" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 457.2 
+L 921.6 457.2 
+L 921.6 0 
+L 0 0 
+z
+" style="fill: #fcfcfb"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 69.12 372.618 
+L 898.56 372.618 
+L 898.56 98.298 
+L 69.12 98.298 
+z
+" style="fill: #fcfcfb"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 69.12 211.770806 
+L 898.56 211.770806 
+L 898.56 202.807555 
+L 69.12 202.807555 
+z
+" clip-path="url(#pb62383f4aa)" style="fill: #eb6834; opacity: 0.1; stroke: #eb6834; stroke-linejoin: miter"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1"/>
+     <g id="text_1">
+      <text style="font-size: 13.5px; font-family: 'DejaVu Sans'; fill: #0b0b0b" transform="translate(174.09418 392.227209)">Cell counts only</text>
+      <text style="font-size: 13.5px; font-family: 'DejaVu Sans'; fill: #0b0b0b" transform="translate(201.22707 408.429846)">(V, E, F)</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2"/>
+     <g id="text_2">
+      <text style="font-size: 13.5px; font-family: 'DejaVu Sans'; fill: #0b0b0b" transform="translate(425.527383 392.227209)">+ local structural</text>
+      <text style="font-size: 13.5px; font-family: 'DejaVu Sans'; fill: #0b0b0b" transform="translate(455.954062 408.4309)">features</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_3"/>
+     <g id="text_3">
+      <text style="font-size: 13.5px; font-family: 'DejaVu Sans'; fill: #0b0b0b" transform="translate(650.939336 392.227209)">+ signed Hodge-Laplacian</text>
+      <text style="font-size: 13.5px; font-family: 'DejaVu Sans'; fill: #0b0b0b" transform="translate(696.1675 408.4309)">eigenvectors</text>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_4">
+      <path d="M 69.12 356.271184 
+L 898.56 356.271184 
+" clip-path="url(#pb62383f4aa)" style="fill: none; stroke: #e1e0d9; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_5"/>
+     <g id="text_4">
+      <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #52514e" x="65.62" y="361.209661" transform="rotate(-0 65.62 361.209661)">0.5</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_6">
+      <path d="M 69.12 305.187385 
+L 898.56 305.187385 
+" clip-path="url(#pb62383f4aa)" style="fill: none; stroke: #e1e0d9; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_7"/>
+     <g id="text_5">
+      <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #52514e" x="65.62" y="310.125862" transform="rotate(-0 65.62 310.125862)">0.6</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_8">
+      <path d="M 69.12 254.103587 
+L 898.56 254.103587 
+" clip-path="url(#pb62383f4aa)" style="fill: none; stroke: #e1e0d9; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_9"/>
+     <g id="text_6">
+      <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #52514e" x="65.62" y="259.042063" transform="rotate(-0 65.62 259.042063)">0.7</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_10">
+      <path d="M 69.12 203.019788 
+L 898.56 203.019788 
+" clip-path="url(#pb62383f4aa)" style="fill: none; stroke: #e1e0d9; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_11"/>
+     <g id="text_7">
+      <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #52514e" x="65.62" y="207.958264" transform="rotate(-0 65.62 207.958264)">0.8</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_12">
+      <path d="M 69.12 151.935989 
+L 898.56 151.935989 
+" clip-path="url(#pb62383f4aa)" style="fill: none; stroke: #e1e0d9; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_13"/>
+     <g id="text_8">
+      <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #52514e" x="65.62" y="156.874465" transform="rotate(-0 65.62 156.874465)">0.9</text>
+     </g>
+    </g>
+    <g id="ytick_6">
+     <g id="line2d_14">
+      <path d="M 69.12 100.85219 
+L 898.56 100.85219 
+" clip-path="url(#pb62383f4aa)" style="fill: none; stroke: #e1e0d9; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_15"/>
+     <g id="text_9">
+      <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #52514e" x="65.62" y="105.790667" transform="rotate(-0 65.62 105.790667)">1.0</text>
+     </g>
+    </g>
+    <g id="text_10">
+     <text style="font-size: 14.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #52514e" x="37.462539" y="235.458" transform="rotate(-90 37.462539 235.458)">Balanced accuracy</text>
+    </g>
+   </g>
+   <g id="line2d_16">
+    <path d="M 69.12 356.271184 
+L 898.56 356.271184 
+" clip-path="url(#pb62383f4aa)" style="fill: none; stroke: #c3c2b7; stroke-width: 1.4; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_17">
+    <path d="M 69.12 207.289181 
+L 898.56 207.289181 
+" clip-path="url(#pb62383f4aa)" style="fill: none; stroke-dasharray: 8,4.8; stroke-dashoffset: 0; stroke: #eb6834; stroke-width: 1.6"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 69.12 372.618 
+L 898.56 372.618 
+" style="fill: none; stroke: #c3c2b7; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 11.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #898781" x="74.24" y="371.9057" transform="rotate(-0 74.24 371.9057)">chance = 0.50</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #52514e" x="79.36" y="197.134519" transform="rotate(-0 79.36 197.134519)">HOPSE — generic unsigned spectral encodings: 0.79 ± 0.01 (3-seed, sweep val-best)</text>
+   </g>
+   <g id="patch_5">
+    <path d="M 174.08 356.271184 
+L 281.6 356.271184 
+L 281.6 356.271184 
+C 281.6 354.751602 279.98828 353.519813 278 353.519813 
+L 177.68 353.519813 
+C 175.69172 353.519813 174.08 354.751602 174.08 356.271184 
+z
+" clip-path="url(#pb62383f4aa)" style="fill: #86b6ef"/>
+   </g>
+   <g id="text_13">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #0b0b0b" x="227.84" y="341.742889" transform="rotate(-0 227.84 341.742889)">0.505</text>
+   </g>
+   <g id="patch_6">
+    <path d="M 430.08 356.271184 
+L 537.6 356.271184 
+L 537.6 339.083044 
+C 537.6 337.094764 535.98828 335.483044 534 335.483044 
+L 433.68 335.483044 
+C 431.69172 335.483044 430.08 337.094764 430.08 339.083044 
+z
+" clip-path="url(#pb62383f4aa)" style="fill: #2a78d6"/>
+   </g>
+   <g id="text_14">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #0b0b0b" x="483.84" y="323.70612" transform="rotate(-0 483.84 323.70612)">0.541</text>
+   </g>
+   <g id="patch_7">
+    <path d="M 686.08 356.271184 
+L 793.6 356.271184 
+L 793.6 167.580882 
+C 793.6 165.592602 791.98828 163.980882 790 163.980882 
+L 689.68 163.980882 
+C 687.69172 163.980882 686.08 165.592602 686.08 167.580882 
+z
+" clip-path="url(#pb62383f4aa)" style="fill: #104281"/>
+   </g>
+   <g id="text_15">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #0b0b0b" x="739.84" y="152.203959" transform="rotate(-0 739.84 152.203959)">0.876</text>
+   </g>
+   <g id="patch_8">
+    <path d="M 550.869915 330.471161 
+Q 576.771202 224.711811 669.980792 171.970113 
+" style="fill: none; stroke: #52514e; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 665.514534 172.199323 
+L 669.980792 171.970113 
+L 667.484405 175.680646 
+" style="fill: none; stroke: #52514e; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="text_16">
+    <text style="font-weight: 700; font-size: 13.5px; font-family: 'DejaVu Sans'; fill: #0b0b0b" transform="translate(450.859492 254.446888)">signed spectral</text>
+    <text style="font-weight: 700; font-size: 13.5px; font-family: 'DejaVu Sans'; fill: #0b0b0b" transform="translate(450.05582 272.682435)">features: +0.34</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #52514e" transform="translate(169.911289 305.632624)">count-only models</text>
+    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #52514e" transform="translate(198.145664 322.468561)">≈ chance</text>
+   </g>
+  </g>
+  <g id="text_18">
+   <text style="font-weight: 700; font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #0b0b0b" x="69.12" y="35.770875" transform="rotate(-0 69.12 35.770875)">Signed Hodge-Laplacian spectra supply the missing global signal</text>
+  </g>
+  <g id="text_19">
+   <text style="font-size: 13.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #52514e" x="69.12" y="62.835891" transform="rotate(-0 69.12 62.835891)">Balanced accuracy on MANTRA orientability, test split — feature ladder, 3-seed means</text>
+  </g>
+  <g id="text_20">
+   <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #898781" x="69.12" y="436.831959" transform="rotate(-0 69.12 436.831959)">Ladder bars: 3-seed means from the frozen claims ledger (rescue experiment); per-seed spread not in the frozen snapshot, so no error bars are drawn.</text>
+  </g>
+  <g id="text_21">
+   <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #898781" x="69.12" y="452.376759" transform="rotate(-0 69.12 452.376759)">HOPSE reference: per-seed validation-accuracy-best, seeds 42/43/44 — unsigned spectral encodings get partway; the signed operator closes the gap.</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pb62383f4aa">
+   <rect x="69.12" y="98.298" width="829.44" height="274.32"/>
+  </clipPath>
+ </defs>
+</svg>

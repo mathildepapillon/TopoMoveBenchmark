@@ -1,0 +1,54 @@
+% ======================================================================
+% Section 2 -- Related Work (~0.5 page budget)
+% "neighborhoods", never "relations". No em dashes. Never a critique
+% of TDL.
+% ======================================================================
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Explaining GNNs.}
+Mask-optimization explainers learn continuous masks over edges and
+features by gradient descent: GNNExplainer per instance
+\citep{ying2019gnnexplainer} and PGExplainer amortized over a dataset
+\citep{luo2020parameterized}. Search-based explainers return discrete
+subgraphs scored by prediction preservation: SubgraphX explores
+coalitions by Monte-Carlo tree search with sampled Shapley rewards
+\citep{yuan2021subgraphx}, and Zorro greedily selects sparse masks with
+stability guarantees \citep{funke2023zorro}. GraphSHAP-IQ computes
+exact any-order Shapley interactions for GNNs
+\citep{muschalik2024graphshapiq}. All of these operate on nodes and
+edges. FORGE \citep{forge2025} lifts graphs to cell complexes before
+explaining, yet still outputs node-level attributions. To our
+knowledge, no prior method explains topological models natively at the
+cell level. \Cref{sec:framework} makes the relationship precise: at
+rank 1 our explanation output solves the search problem of SubgraphX,
+and the remaining design differences are ablated in
+\cref{sec:predictions}.
+
+\paragraph{Topological deep learning.}
+TDL generalizes message passing to simplicial complexes, cellular
+complexes, hypergraphs, and combinatorial complexes
+\citep{hajij2023tdl,papamarkou2024position}. Representative
+architectures include CWN \citep{bodnar2021cwn}, SCCNN
+\citep{yang2022sccnn}, CAN \citep{giusti2022can}, and CCXN
+\citep{hajij2020ccxn}. TopoTune \citep{papillon2025topotune} defines
+the GCCN design space we study: an architecture is specified by its
+neighborhood set, which makes ``which neighborhoods matter'' a
+first-class question. TopoBench \citep{telyatnikov2024topobench}
+standardizes liftings, models, and training; all our experiments run on
+it. HOPSE \citep{hopse2025} computes higher-order representations
+without message passing. Our game treats HOPSE and message-passing
+TNNs identically because it only requires forward evaluations.
+
+\paragraph{Shapley values.}
+The Shapley value is the unique attribution satisfying efficiency,
+symmetry, null player, and linearity \citep{shapley1953value};
+interaction indices extend it to coalitions
+\citep{grabisch1999axiomatic}. SHAP popularized Shapley explanations
+for machine-learning models \citep{lundberg2017shap}; permutation
+sampling gives unbiased estimates at controlled cost
+\citep{castro2009polynomial,strumbelj2010efficient}. Using Shapley
+values to select players is unsound under redundancy
+\citep{fryer2021shapley}. Our selection recipe therefore uses the game
+only to order candidates and certifies every choice by validation over
+trained models (\cref{sec:framework-game2}).

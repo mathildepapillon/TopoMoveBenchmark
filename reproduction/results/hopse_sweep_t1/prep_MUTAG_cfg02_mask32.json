@@ -1,0 +1,5 @@
+{
+ "dataset": "MUTAG",
+ "tag": "cfg02_mask32",
+ "preprocessing_seconds": 5.4548139572143555
+}
