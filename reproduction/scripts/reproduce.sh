@@ -1,7 +1,6 @@
 #!/bin/bash
 # Regenerate every derived artifact from data/frozen/: tests, tables and
 # paper macros, both figures, and the deck-number consistency checks.
-# Optionally builds the paper PDF with --with-paper (needs tectonic on
 # PATH or at $TECTONIC).
 #
 # Frozen inputs are ingested per data/INGEST.md (never recomputed here);
@@ -13,7 +12,7 @@
 #                  -->  figures/mantra_attr_pair.png
 #                  -->  deck numbers verified against the same parquets
 #
-# Usage: scripts/reproduce.sh [--with-paper]
+# Usage: scripts/reproduce.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
 source .venv/bin/activate
@@ -44,12 +43,6 @@ python figures/slides_assets/make_mantra_slides.py           # deck assets
 
 echo "== 5/5 deck number consistency =="
 python scripts/check_deck_numbers.py
-
-if [[ "${1:-}" == "--with-paper" ]]; then
-  echo "== paper PDF =="
-  TECTONIC_BIN="${TECTONIC:-tectonic}"
-  (cd paper && "$TECTONIC_BIN" main.tex)
-fi
 
 echo
 echo "reproduce: all steps completed"

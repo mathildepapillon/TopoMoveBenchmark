@@ -14,7 +14,7 @@ every table, macro, and figure in the paper.
   11-neighborhood vocabulary, games, cost accounting, frozen IO).
 - `reproduction/experiments/`: one runner + one assembler per arm.
 - `reproduction/scripts/`: `reproduce.sh` (tests -> tables -> macros ->
-  figures -> optional paper PDF), table generators, freeze integrity.
+  figures), table generators, freeze integrity.
 - `reproduction/results/`: raw per-run JSONL records of the local
   campaign (checkpoints excluded).
 - `reproduction/data/frozen/`: NOT in git (1.8 GB). Obtain per
@@ -36,7 +36,7 @@ uv pip install torch-scatter torch-sparse torch-cluster --no-build-isolation \
 ## Reproduce
 
 ```bash
-cd reproduction && scripts/reproduce.sh --with-paper
+cd reproduction && scripts/reproduce.sh
 ```
 
 ## Provenance note
@@ -49,5 +49,4 @@ natively; the runtime patch is a no-op there. For bit-exact reruns of
 the historical record, check out `toposhap-pin` and install it in place
 of the root package. `reproduction/EXPERIMENTS.md` maps every
 arm to its runner and frozen frame; the exact selection protocol and
-measurement conventions are in the paper's experimental appendix
-(`reproduction/paper/sections/appendix_experimental.tex`).
+measurement conventions are in the paper's experimental appendix.
